@@ -1,110 +1,53 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
 
+/* Tailwind Directives - REQUIRED FOR TAILWIND CSS TO WORK */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ============================= */
+/* GLOBAL STYLES & RESETS */
+/* ============================= */
 
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
-html {
-  scroll-behavior: smooth;
-  -webkit-text-size-adjust: 100%;
-  -ms-text-size-adjust: 100%;
-}
-
-body {
-  font-family: 'Poppins', 'Inter', system-ui, sans-serif;
-  background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0a0e27 100%);
-  color: #ffffff;
-  line-height: 1.6;
-  overflow-x: hidden;
-}
-
-html, body, #root {
+html, body {
   width: 100%;
   height: 100%;
+  overflow-x: hidden;
+  font-family: 'Poppins', 'Inter', sans-serif;
+  background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0a0e27 100%);
+  color: #ffffff;
 }
 
 #root {
-  display: flex;
-  flex-direction: column;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
 }
 
-/* Typography */
+/* ============================= */
+/* TYPOGRAPHY */
+/* ============================= */
+
 h1, h2, h3, h4, h5, h6 {
+  font-family: 'Poppins', sans-serif;
   font-weight: 700;
   letter-spacing: -0.5px;
-  line-height: 1.2;
-}
-
-h1 {
-  font-size: clamp(1.5rem, 5vw, 2.5rem);
-  font-weight: 800;
-}
-
-h2 {
-  font-size: clamp(1.25rem, 4vw, 2rem);
-  font-weight: 700;
-}
-
-h3 {
-  font-size: clamp(1rem, 3vw, 1.5rem);
-  font-weight: 700;
 }
 
 p {
-  font-size: clamp(0.875rem, 2vw, 1rem);
   line-height: 1.6;
 }
 
-/* Inputs & Forms */
-input,
-select,
-textarea {
-  font-family: inherit;
-  font-size: 1rem;
-  border-radius: 0.75rem;
-  transition: all 0.3s ease;
-}
+/* ============================= */
+/* SCROLLBAR STYLING */
+/* ============================= */
 
-input:focus,
-select:focus,
-textarea:focus {
-  outline: none;
-  border-color: #00ff00;
-  box-shadow: 0 0 0 3px rgba(0, 255, 0, 0.1);
-}
-
-input::placeholder {
-  color: #8b8b8b;
-  opacity: 0.7;
-}
-
-/* Buttons */
-button {
-  font-family: inherit;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  border: none;
-  user-select: none;
-}
-
-button:active {
-  transform: scale(0.98);
-}
-
-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -123,7 +66,72 @@ button:disabled {
   background: #b8b8b8;
 }
 
-/* Selection */
+/* Hide scrollbar but allow scrolling */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* ============================= */
+/* FORM ELEMENTS */
+/* ============================= */
+
+input,
+select,
+textarea {
+  font-family: 'Poppins', 'Inter', sans-serif;
+  background-color: rgba(26, 31, 58, 0.8);
+  border: 1px solid rgba(139, 139, 139, 0.3);
+  color: #ffffff;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: #00ff00;
+  box-shadow: 0 0 0 3px rgba(0, 255, 0, 0.1);
+  background-color: rgba(26, 31, 58, 1);
+}
+
+input::placeholder {
+  color: #8b8b8b;
+}
+
+/* ============================= */
+/* BUTTONS */
+/* ============================= */
+
+button {
+  font-family: 'Poppins', sans-serif;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ============================= */
+/* TEXT SELECTION */
+/* ============================= */
+
 ::selection {
   background-color: #00ff00;
   color: #0a0e27;
@@ -134,11 +142,18 @@ button:disabled {
   color: #0a0e27;
 }
 
-/* Animations */
+/* ============================= */
+/* ANIMATIONS */
+/* ============================= */
+
 @keyframes spin {
   to {
     transform: rotate(360deg);
   }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
 }
 
 @keyframes pulse {
@@ -150,80 +165,124 @@ button:disabled {
   }
 }
 
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(10px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
   }
-}
-
-@keyframes slideUp {
-  from {
-    transform: translateY(100%);
-  }
-  to {
-    transform: translateY(0);
-  }
-}
-
-.animate-spin {
-  animation: spin 1s linear infinite;
-}
-
-.animate-pulse {
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 .animate-fadeIn {
   animation: fadeIn 0.3s ease-in;
 }
 
+@keyframes slideUp {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
 .animate-slideUp {
   animation: slideUp 0.3s ease-out;
 }
 
-/* Mobile Optimizations */
+@keyframes slideDown {
+  from {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slideDown {
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+.animate-bounce {
+  animation: bounce 1s ease-in-out infinite;
+}
+
+/* ============================= */
+/* ACCESSIBILITY */
+/* ============================= */
+
+:focus-visible {
+  outline: 2px solid #00ff00;
+  outline-offset: 2px;
+}
+
+/* Prevent double tap zoom on buttons */
+button,
+a,
+input {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* ============================= */
+/* MOBILE OPTIMIZATION */
+/* ============================= */
+
+/* Safe Area Support for iPhone X+ */
 @supports (padding: max(0px)) {
   body {
     padding-left: max(12px, env(safe-area-inset-left));
     padding-right: max(12px, env(safe-area-inset-right));
   }
-}
 
-/* Responsive Design */
-@media (max-width: 375px) {
-  h1 {
-    font-size: 1.5rem;
+  .safe-area-bottom {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
   }
-  h2 {
-    font-size: 1.25rem;
-  }
-  h3 {
-    font-size: 1rem;
+
+  .safe-area-top {
+    padding-top: max(1rem, env(safe-area-inset-top));
   }
 }
 
-@media (min-width: 376px) {
-  h1 {
-    font-size: 2rem;
-  }
-  h2 {
-    font-size: 1.75rem;
-  }
-  h3 {
-    font-size: 1.5rem;
-  }
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
 }
 
-/* Utilities */
+/* ============================= */
+/* UTILITY CLASSES */
+/* ============================= */
+
 .truncate {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.line-clamp-1 {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .line-clamp-2 {
@@ -240,7 +299,88 @@ button:disabled {
   overflow: hidden;
 }
 
-/* Smooth Transitions */
+.loading {
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+/* ============================= */
+/* CUSTOM FITNESS APP CLASSES */
+/* ============================= */
+
+.fitness-card {
+  @apply bg-dark-secondary border border-metallic border-opacity-30 rounded-lg;
+  @apply hover:border-accent hover:border-opacity-50 transition-colors;
+}
+
+.fitness-btn-primary {
+  @apply bg-accent hover:bg-green-400 text-dark font-bold;
+  @apply transition-all duration-300;
+}
+
+.fitness-btn-secondary {
+  @apply bg-dark-secondary border border-metallic border-opacity-30;
+  @apply hover:border-metallic hover:border-opacity-50 text-metallic font-bold;
+  @apply transition-all;
+}
+
+.fitness-badge {
+  @apply px-2 py-1 rounded-full text-xs font-bold;
+  @apply bg-accent bg-opacity-20 text-accent;
+}
+
+.fitness-stat {
+  @apply text-center;
+}
+
+.fitness-stat-value {
+  @apply text-2xl font-bold text-accent;
+}
+
+.fitness-stat-label {
+  @apply text-metallic text-xs font-bold;
+}
+
+/* ============================= */
+/* RESPONSIVE ADJUSTMENTS */
+/* ============================= */
+
+@media (max-width: 480px) {
+  body {
+    font-size: 14px;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  h2 {
+    font-size: 1.25rem;
+  }
+
+  h3 {
+    font-size: 1rem;
+  }
+}
+
+@media (min-width: 481px) {
+  h1 {
+    font-size: 2rem;
+  }
+
+  h2 {
+    font-size: 1.75rem;
+  }
+
+  h3 {
+    font-size: 1.5rem;
+  }
+}
+
+/* ============================= */
+/* SMOOTH TRANSITIONS */
+/* ============================= */
+
 * {
   transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
@@ -248,16 +388,4 @@ button:disabled {
 button,
 a {
   transition: all 0.3s ease;
-}
-
-/* Loading State */
-.loading {
-  pointer-events: none;
-  opacity: 0.6;
-}
-
-/* Focus visible for accessibility */
-:focus-visible {
-  outline: 2px solid #00ff00;
-  outline-offset: 2px;
 }

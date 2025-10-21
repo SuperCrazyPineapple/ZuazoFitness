@@ -1,7 +1,7 @@
 // src/components/MyProgress.jsx
 
 import React, { useState } from 'react';
-import { TrendingUp, Download, Calendar, Activity, Target, Zap } from 'lucide-react';
+import { TrendingUp, Download, Calendar, Activity, Target, Zap, Award, Filter } from 'lucide-react';
 
 export default function MyProgress({ user }) {
   const [timeRange, setTimeRange] = useState('week');
@@ -22,6 +22,8 @@ export default function MyProgress({ user }) {
     { day: 'Sat', workouts: 2, duration: 90, calories: 580 },
     { day: 'Sun', workouts: 1, duration: 45, calories: 310 }
   ];
+
+  const maxValue = Math.max(...weekData.map(d => d.duration)) || 60;
 
   const progressExercises = [
     {
@@ -55,6 +57,22 @@ export default function MyProgress({ user }) {
       progress: 50,
       unit: 'seconds',
       trend: '+20s this month'
+    },
+    {
+      name: 'Dips',
+      current: 25,
+      personal: 30,
+      progress: 83,
+      unit: 'reps',
+      trend: '+8 this month'
+    },
+    {
+      name: 'Squats',
+      current: 60,
+      personal: 80,
+      progress: 75,
+      unit: 'reps',
+      trend: '+12 this month'
     }
   ];
 
@@ -67,78 +85,105 @@ export default function MyProgress({ user }) {
     { id: 6, name: 'Consistency King', icon: '👑', unlocked: false, description: '30-day streak' }
   ];
 
-  const bodyProgress = [
-    { metric: 'Weight', value: '72 kg', change: '-3 kg', unit: 'kg', target: '68 kg', progress: 75 },
-    { metric: 'Body Fat', value: '18%', change: '-2%', unit: '%', target: '12%', progress: 50 },
-    { metric: 'Muscle Mass', value: '62 kg', change: '+2 kg', unit: 'kg', target: '68 kg', progress: 65 }
+  const monthlyData = [
+    { week: 'Week 1', workouts: 3, hours: 3.5, calories: 1200 },
+    { week: 'Week 2', workouts: 4, hours: 4.2, calories: 1500 },
+    { week: 'Week 3', workouts: 5, hours: 5.1, calories: 1820 },
+    { week: 'Week 4', workouts: 5, hours: 4.8, calories: 1720 }
   ];
 
-  const maxValue = Math.max(...weekData.map(d => d.duration));
+  const bodyMetrics = [
+    { label: 'Weight', value: '75 kg', change: '-2 kg', icon: '⚖️', color: 'text-green-400' },
+    { label: 'BMI', value: '23.1', change: '-0.5', icon: '📏', color: 'text-green-400' },
+    { label: 'Body Fat', value: '16%', change: '-2%', icon: '📊', color: 'text-yellow-400' },
+    { label: 'Muscle Mass', value: '58 kg', change: '+1.2 kg', icon: '💪', color: 'text-accent' }
+  ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-dark via-dark-secondary to-dark font-sport text-white pb-20">
+    <div className="min-h-screen bg-gradient-to-b from-dark via-dark-secondary to-dark font-poppins text-white pb-28">
       {/* Header */}
-      <div className="sticky top-0 z-20 bg-dark border-b border-metallic border-opacity-20 backdrop-blur-sm">
+      <div className="sticky top-0 z-20 bg-dark-secondary border-b border-metallic border-opacity-20 backdrop-blur-sm">
         <div className="max-w-md mx-auto px-6 py-4">
-          <h1 className="text-3xl font-bold tracking-wider mb-4">My Progress</h1>
-          
-          {/* Time Range Tabs */}
-          <div className="flex gap-2 mb-4">
-            {['week', 'month', 'year'].map(range => (
-              <button
-                key={range}
-                onClick={() => setTimeRange(range)}
-                className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
-                  timeRange === range
-                    ? 'bg-accent text-dark'
-                    : 'bg-dark-secondary border border-metallic border-opacity-30 text-metallic hover:text-metallic-light'
-                }`}
-              >
-                {range.charAt(0).toUpperCase() + range.slice(1)}
-              </button>
-            ))}
-          </div>
-
-          {/* Export Button */}
-          <button className="w-full bg-dark-secondary border border-metallic border-opacity-30 hover:border-metallic hover:border-opacity-50 rounded-lg py-2 flex items-center justify-center gap-2 transition-colors">
-            <Download size={18} />
-            Export Report
-          </button>
+          <h1 className="text-2xl font-bold">My Progress</h1>
+          <p className="text-metallic text-sm">Track your fitness journey</p>
         </div>
       </div>
 
-      <div className="max-w-md mx-auto px-6 py-6">
-        
-        {/* Key Stats */}
+      <div className="max-w-md mx-auto px-6">
+        {/* Time Range Filter */}
+        <div className="flex gap-2 mt-6 mb-6 overflow-x-auto pb-2">
+          {['week', 'month', 'year'].map(range => (
+            <button
+              key={range}
+              onClick={() => setTimeRange(range)}
+              className={`px-4 py-2 rounded-full whitespace-nowrap font-bold text-sm transition ${
+                timeRange === range
+                  ? 'bg-accent text-dark'
+                  : 'bg-dark-secondary border border-metallic border-opacity-30 hover:border-metallic hover:border-opacity-50'
+              }`}
+            >
+              {range.charAt(0).toUpperCase() + range.slice(1)}
+            </button>
+          ))}
+        </div>
+
+        {/* Stats Grid */}
         <div className="grid grid-cols-2 gap-3 mb-6">
           {stats.map((stat, idx) => {
             const Icon = typeof stat.icon === 'string' ? null : stat.icon;
             return (
               <div key={idx} className="bg-dark-secondary border border-metallic border-opacity-30 rounded-lg p-4">
                 <div className="flex items-center justify-between mb-2">
-                  {Icon ? <Icon size={20} className={stat.color} /> : <span className="text-2xl">{stat.icon}</span>}
+                  {Icon ? (
+                    <Icon size={20} className={stat.color} />
+                  ) : (
+                    <span className="text-2xl">{stat.icon}</span>
+                  )}
                   <span className="text-accent text-xs font-bold">{stat.change}</span>
                 </div>
-                <p className="text-metallic text-xs mb-1">{stat.label}</p>
+                <p className="text-metallic text-xs mb-1 font-bold">{stat.label}</p>
                 <p className="text-2xl font-bold">{stat.value}</p>
               </div>
             );
           })}
         </div>
 
+        {/* Body Metrics */}
+        <div className="mb-6">
+          <h3 className="font-bold mb-3 flex items-center gap-2">
+            <TrendingUp size={18} className="text-accent" />
+            Body Metrics
+          </h3>
+          <div className="grid grid-cols-2 gap-3">
+            {bodyMetrics.map((metric, idx) => (
+              <div key={idx} className="bg-dark-secondary border border-metallic border-opacity-30 rounded-lg p-3">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-2xl">{metric.icon}</span>
+                  <span className={`text-xs font-bold ${metric.color}`}>{metric.change}</span>
+                </div>
+                <p className="text-metallic text-xs mb-1">{metric.label}</p>
+                <p className="text-lg font-bold">{metric.value}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* Weekly Activity Chart */}
         <div className="bg-dark-secondary border border-metallic border-opacity-30 rounded-lg p-4 mb-6">
-          <h3 className="font-bold mb-4">Weekly Activity</h3>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-bold">Weekly Activity</h3>
+            <Filter size={16} className="text-metallic" />
+          </div>
           <div className="flex items-end justify-around gap-2 h-40">
             {weekData.map((day, idx) => (
               <div key={idx} className="flex flex-col items-center gap-1 flex-1">
                 <div className="relative w-full group">
                   <div
-                    className="w-full bg-gradient-to-t from-accent to-green-300 rounded-t-lg transition-all duration-300 hover:from-green-300 hover:to-green-200"
+                    className="w-full bg-gradient-to-t from-accent to-green-300 rounded-t-lg transition-all duration-300 hover:from-green-300 hover:to-green-200 cursor-pointer"
                     style={{ height: `${(day.duration / maxValue) * 120 || 4}px` }}
                   />
                   {day.workouts > 0 && (
-                    <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-dark px-2 py-1 rounded text-xs font-bold whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-dark px-2 py-1 rounded text-xs font-bold whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity z-10 border border-metallic border-opacity-30">
                       {day.duration}m
                     </div>
                   )}
@@ -152,12 +197,43 @@ export default function MyProgress({ user }) {
           </div>
         </div>
 
+        {/* Monthly Overview */}
+        <div className="mb-6">
+          <h3 className="font-bold mb-3">Monthly Overview</h3>
+          <div className="space-y-2">
+            {monthlyData.map((week, idx) => (
+              <div key={idx} className="bg-dark-secondary border border-metallic border-opacity-30 rounded-lg p-3">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="font-bold text-sm">{week.week}</p>
+                  <div className="flex gap-4 text-xs font-bold">
+                    <span className="text-accent">{week.workouts} WO</span>
+                    <span className="text-blue-400">{week.hours}h</span>
+                    <span className="text-red-400">{week.calories} cal</span>
+                  </div>
+                </div>
+                <div className="w-full h-2 bg-dark rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-gradient-to-r from-accent to-green-400 rounded-full"
+                    style={{ width: `${(week.workouts / 5) * 100}%` }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* Exercise PRs */}
         <div className="mb-6">
-          <h3 className="font-bold mb-4">Exercise Progress</h3>
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-bold flex items-center gap-2">
+              <Award size={18} className="text-accent" />
+              Exercise Progress
+            </h3>
+            <button className="text-accent text-xs hover:text-green-300 font-bold">View All</button>
+          </div>
           <div className="space-y-3">
             {progressExercises.map((ex, idx) => (
-              <div key={idx} className="bg-dark-secondary border border-metallic border-opacity-30 rounded-lg p-4">
+              <div key={idx} className="bg-dark-secondary border border-metallic border-opacity-30 rounded-lg p-4 hover:border-accent hover:border-opacity-50 transition cursor-pointer">
                 <div className="flex items-center justify-between mb-2">
                   <h4 className="font-bold">{ex.name}</h4>
                   <span className="text-accent text-sm font-bold">{ex.current} {ex.unit}</span>
@@ -165,43 +241,14 @@ export default function MyProgress({ user }) {
                 <div className="mb-2">
                   <div className="w-full h-2 bg-dark rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-accent rounded-full transition-all"
+                      className="h-full bg-gradient-to-r from-accent to-green-400 rounded-full transition-all"
                       style={{ width: `${ex.progress}%` }}
                     />
                   </div>
                 </div>
-                <div className="flex items-center justify-between">
-                  <p className="text-metallic text-xs">Goal: {ex.personal} {ex.unit}</p>
-                  <p className="text-green-400 text-xs font-semibold">{ex.trend}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Body Metrics */}
-        <div className="mb-6">
-          <h3 className="font-bold mb-4">Body Metrics</h3>
-          <div className="space-y-3">
-            {bodyProgress.map((metric, idx) => (
-              <div key={idx} className="bg-dark-secondary border border-metallic border-opacity-30 rounded-lg p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <div>
-                    <p className="text-metallic text-xs mb-1">{metric.metric}</p>
-                    <p className="font-bold text-lg">{metric.value}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className={`text-sm font-bold ${metric.change.startsWith('-') ? 'text-red-400' : 'text-green-400'}`}>
-                      {metric.change}
-                    </p>
-                    <p className="text-metallic text-xs">Target: {metric.target}</p>
-                  </div>
-                </div>
-                <div className="w-full h-2 bg-dark rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-accent rounded-full transition-all"
-                    style={{ width: `${metric.progress}%` }}
-                  />
+                <div className="flex justify-between text-xs">
+                  <p className="text-metallic">PR: {ex.personal} {ex.unit}</p>
+                  <p className="text-green-400 font-bold">{ex.trend}</p>
                 </div>
               </div>
             ))}
@@ -210,28 +257,43 @@ export default function MyProgress({ user }) {
 
         {/* Achievements */}
         <div className="mb-6">
-          <h3 className="font-bold mb-4">Achievements</h3>
-          <div className="grid grid-cols-3 gap-3">
-            {achievements.map(achievement => (
+          <h3 className="font-bold mb-3">Badges & Achievements</h3>
+          <div className="grid grid-cols-3 gap-2">
+            {achievements.map((badge, idx) => (
               <div
-                key={achievement.id}
-                className={`rounded-lg p-4 text-center transition-all ${
-                  achievement.unlocked
-                    ? 'bg-dark-secondary border border-accent border-opacity-50'
-                    : 'bg-dark-secondary border border-metallic border-opacity-20 opacity-50'
+                key={idx}
+                className={`flex flex-col items-center gap-2 p-3 rounded-lg border transition ${
+                  badge.unlocked
+                    ? 'bg-dark-secondary border-accent border-opacity-50 cursor-pointer hover:border-opacity-100'
+                    : 'bg-dark border-metallic border-opacity-30 opacity-50'
                 }`}
               >
-                <p className="text-3xl mb-2">{achievement.icon}</p>
-                <p className="text-xs font-bold mb-1">{achievement.name}</p>
-                {achievement.unlocked && achievement.date && (
-                  <p className="text-metallic text-xs">{achievement.date}</p>
-                )}
-                {!achievement.unlocked && (
-                  <p className="text-metallic text-xs">{achievement.description}</p>
+                <span className="text-3xl">{badge.icon}</span>
+                <p className="text-xs text-center font-bold line-clamp-2">{badge.name}</p>
+                {badge.unlocked && badge.date && (
+                  <p className="text-metallic text-xs">{badge.date}</p>
                 )}
               </div>
             ))}
           </div>
+        </div>
+
+        {/* Download Report */}
+        <div className="mb-6">
+          <button className="w-full bg-accent hover:bg-green-400 text-dark font-bold py-4 rounded-lg transition flex items-center justify-center gap-2">
+            <Download size={18} />
+            Download Progress Report
+          </button>
+        </div>
+
+        {/* Motivational Section */}
+        <div className="bg-gradient-to-r from-accent to-green-400 rounded-lg p-6 text-dark text-center mb-6">
+          <p className="text-4xl mb-2">🎯</p>
+          <h3 className="font-bold text-lg mb-1">Keep It Going!</h3>
+          <p className="text-sm opacity-90 mb-3">You're making amazing progress. Stay consistent!</p>
+          <button className="bg-dark hover:bg-dark-secondary text-accent font-bold px-6 py-2 rounded-lg transition text-sm">
+            View Goals
+          </button>
         </div>
       </div>
     </div>

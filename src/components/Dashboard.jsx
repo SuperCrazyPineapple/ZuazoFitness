@@ -14,7 +14,10 @@ import {
   Settings,
   Play,
   Calendar,
-  Activity
+  Activity,
+  Droplet,
+  Moon,
+  AlertCircle
 } from 'lucide-react';
 
 export default function Dashboard({ user }) {
@@ -33,6 +36,14 @@ export default function Dashboard({ user }) {
   // Week data
   const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   const workoutDays = [3, 5, 4, 6, 5, 0, 0];
+
+  // Today's objectives
+  const todayObjectives = [
+    { label: 'Calories', value: 1245, goal: 2000, icon: Flame, color: 'text-red-400' },
+    { label: 'Water', value: 6, goal: 8, icon: Droplet, color: 'text-blue-400' },
+    { label: 'Sleep', value: 7.5, goal: 8, icon: Moon, color: 'text-purple-400' },
+    { label: 'Steps', value: 8432, goal: 10000, icon: Activity, color: 'text-green-400' }
+  ];
 
   // Programs
   const programs = [
@@ -78,10 +89,34 @@ export default function Dashboard({ user }) {
     { name: 'Leg Day', time: 'Wed at 16:00', type: 'Scheduled' }
   ];
 
+  const renderObjective = (obj) => {
+    const Icon = obj.icon;
+    const percentage = (obj.value / obj.goal) * 100;
+    return (
+      <div key={obj.label} className="flex items-center gap-3">
+        <div className="flex-shrink-0">
+          <Icon size={24} className={obj.color} />
+        </div>
+        <div className="flex-1">
+          <div className="flex justify-between mb-1 text-xs">
+            <span className="font-bold">{obj.label}</span>
+            <span className="text-metallic">{obj.value} / {obj.goal}</span>
+          </div>
+          <div className="w-full h-2 bg-dark rounded-full overflow-hidden">
+            <div
+              className={`h-full rounded-full ${obj.color.replace('text', 'bg')} transition-all`}
+              style={{ width: `${Math.min(percentage, 100)}%` }}
+            />
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-dark via-dark-secondary to-dark font-sport text-white pb-28">
+    <div className="min-h-screen bg-gradient-to-b from-dark via-dark-secondary to-dark font-poppins text-white pb-28">
       {/* Header */}
-      <div className="sticky top-0 z-20 bg-dark border-b border-metallic border-opacity-20 backdrop-blur-sm">
+      <div className="sticky top-0 z-20 bg-dark-secondary border-b border-metallic border-opacity-20 backdrop-blur-sm">
         <div className="max-w-md mx-auto px-6 py-4 flex items-center justify-between">
           <div>
             <p className="text-metallic text-xs font-semibold">WELCOME BACK</p>
@@ -101,6 +136,15 @@ export default function Dashboard({ user }) {
 
       {/* Content */}
       <div className="max-w-md mx-auto px-6">
+        {/* Notification Banner */}
+        <div className="mt-6 bg-yellow-500 bg-opacity-20 border border-yellow-500 border-opacity-50 rounded-lg p-3 flex items-start gap-2">
+          <AlertCircle size={18} className="text-yellow-400 flex-shrink-0 mt-0.5" />
+          <div>
+            <p className="font-bold text-sm">You're on a 7-day streak! 🔥</p>
+            <p className="text-metallic text-xs">Don't miss today's workout to keep it going</p>
+          </div>
+        </div>
+
         {/* Workout of the Day */}
         <div className="mt-6 bg-gradient-to-br from-dark-secondary to-dark border-2 border-metallic border-opacity-30 rounded-2xl overflow-hidden hover:border-metallic hover:border-opacity-50 transition-all">
           <div className="aspect-video bg-gradient-to-br from-accent from-10% via-dark-secondary to-dark relative overflow-hidden flex items-center justify-center">
@@ -156,6 +200,14 @@ export default function Dashboard({ user }) {
           </div>
         </div>
 
+        {/* Today's Objectives */}
+        <div className="mt-6">
+          <h3 className="text-lg font-bold mb-3">Today's Goals</h3>
+          <div className="bg-dark-secondary border border-metallic border-opacity-30 rounded-xl p-4 space-y-4">
+            {todayObjectives.map(renderObjective)}
+          </div>
+        </div>
+
         {/* Stats Grid */}
         <div className="grid grid-cols-2 gap-3 mt-6">
           {stats.map((stat, idx) => {
@@ -179,18 +231,18 @@ export default function Dashboard({ user }) {
         {/* Weekly Activity */}
         <div className="mt-6">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-lg font-bold">This Week's Activity</h3>
+            <h3 className="text-lg font-bold">This Week</h3>
             <button className="text-accent text-xs hover:text-green-300 transition font-semibold">
               View Details
             </button>
           </div>
-          <div className="bg-dark-secondary border border-metallic border-opacity-30 rounded-xl p-4 hover:border-metallic hover:border-opacity-50 transition-colors">
+          <div className="bg-dark-secondary border border-metallic border-opacity-30 rounded-xl p-4">
             <div className="flex items-end justify-around gap-2 h-40">
               {weekDays.map((day, idx) => (
                 <div key={idx} className="flex flex-col items-center gap-1 flex-1">
                   <div className="relative group w-full flex justify-center">
                     <div
-                      className="w-6 bg-gradient-to-t from-accent to-green-300 rounded-t-lg transition-all duration-300 hover:from-green-300 hover:to-green-200"
+                      className="w-6 bg-gradient-to-t from-accent to-green-300 rounded-t-lg transition-all duration-300 hover:from-green-300 hover:to-green-200 cursor-pointer"
                       style={{ height: `${(workoutDays[idx] / 6) * 120 || 8}px` }}
                     />
                     {workoutDays[idx] > 0 && (
@@ -252,9 +304,9 @@ export default function Dashboard({ user }) {
         </div>
 
         {/* Upcoming Workouts */}
-        <div className="mt-6">
+        <div className="mt-6 mb-6">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-lg font-bold">Upcoming Workouts</h3>
+            <h3 className="text-lg font-bold">Upcoming</h3>
             <button className="text-accent text-xs hover:text-green-300 transition font-semibold">
               Schedule
             </button>
@@ -303,15 +355,13 @@ export default function Dashboard({ user }) {
                 </div>
                 <div className="text-right ml-2">
                   <p className="text-sm font-bold">{workout.duration}m</p>
-                  <p
-                    className={`text-xs font-bold ${
-                      workout.intensity === 'High'
-                        ? 'text-red-400'
-                        : workout.intensity === 'Medium'
-                        ? 'text-yellow-400'
-                        : 'text-green-400'
-                    }`}
-                  >
+                  <p className={`text-xs font-bold ${
+                    workout.intensity === 'High'
+                      ? 'text-red-400'
+                      : workout.intensity === 'Medium'
+                      ? 'text-yellow-400'
+                      : 'text-green-400'
+                  }`}>
                     {workout.intensity}
                   </p>
                 </div>
@@ -319,36 +369,7 @@ export default function Dashboard({ user }) {
             ))}
           </div>
         </div>
-
-        {/* Motivation Banner */}
-        <div className="mt-6 mb-6 bg-gradient-to-r from-accent from-0% via-green-400 to-accent to-100% rounded-xl p-6 text-dark relative overflow-hidden">
-          <div className="absolute inset-0 opacity-10">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-white rounded-full blur-3xl"></div>
-          </div>
-          <div className="relative z-10">
-            <p className="text-sm font-bold mb-1">🔥 KEEP IT UP!</p>
-            <h3 className="text-xl font-bold mb-2">Your 7-day streak is going strong!</h3>
-            <p className="text-sm opacity-90">Complete 3 more workouts to unlock the "Warrior" badge.</p>
-            <button className="mt-3 bg-dark hover:bg-opacity-90 text-accent px-4 py-2 rounded-lg font-bold text-sm transition-colors">
-              View Achievements
-            </button>
-          </div>
-        </div>
       </div>
-
-      <style>{`
-        @keyframes pulse {
-          0%, 100% {
-            opacity: 1;
-          }
-          50% {
-            opacity: 0.5;
-          }
-        }
-        .animate-pulse {
-          animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
-      `}</style>
     </div>
   );
 }
