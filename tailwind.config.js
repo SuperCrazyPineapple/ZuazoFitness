@@ -133,11 +133,8 @@ export default {
       },
     },
   },
-  plugins: [
-    require('@tailwindcss/line-clamp'),
-  ],
+  plugins: [],
   safelist: [
-    // Colors
     'text-accent',
     'text-red-400',
     'text-red-500',
@@ -170,7 +167,6 @@ export default {
     'bg-dark',
     'bg-dark-secondary',
     'bg-metallic',
-    // Opacity
     'bg-opacity-5',
     'bg-opacity-10',
     'bg-opacity-15',
@@ -187,7 +183,6 @@ export default {
     'border-opacity-20',
     'border-opacity-30',
     'border-opacity-50',
-    // Border
     'border-accent',
     'border-red-400',
     'border-red-500',
@@ -195,7 +190,6 @@ export default {
     'border-green-500',
     'border-blue-400',
     'border-metallic',
-    // Hover states
     'hover:bg-dark',
     'hover:bg-dark-secondary',
     'hover:bg-accent',

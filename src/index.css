@@ -1,13 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
 
-/* Tailwind Directives - REQUIRED FOR TAILWIND CSS TO WORK */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* ============================= */
-/* GLOBAL STYLES & RESETS */
-/* ============================= */
 
 * {
   margin: 0;
@@ -18,7 +13,6 @@
 html, body {
   width: 100%;
   height: 100%;
-  overflow-x: hidden;
   font-family: 'Poppins', 'Inter', sans-serif;
   background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0a0e27 100%);
   color: #ffffff;
@@ -30,24 +24,7 @@ html, body {
   overflow: hidden;
 }
 
-/* ============================= */
-/* TYPOGRAPHY */
-/* ============================= */
-
-h1, h2, h3, h4, h5, h6 {
-  font-family: 'Poppins', sans-serif;
-  font-weight: 700;
-  letter-spacing: -0.5px;
-}
-
-p {
-  line-height: 1.6;
-}
-
-/* ============================= */
-/* SCROLLBAR STYLING */
-/* ============================= */
-
+/* Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -66,20 +43,17 @@ p {
   background: #b8b8b8;
 }
 
-/* Hide scrollbar but allow scrolling */
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+  letter-spacing: -0.5px;
 }
 
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
+p {
+  line-height: 1.6;
 }
 
-/* ============================= */
-/* FORM ELEMENTS */
-/* ============================= */
-
+/* Forms */
 input,
 select,
 textarea {
@@ -98,54 +72,31 @@ textarea:focus {
   outline: none;
   border-color: #00ff00;
   box-shadow: 0 0 0 3px rgba(0, 255, 0, 0.1);
-  background-color: rgba(26, 31, 58, 1);
 }
 
 input::placeholder {
   color: #8b8b8b;
 }
 
-/* ============================= */
-/* BUTTONS */
-/* ============================= */
-
+/* Buttons */
 button {
   font-family: 'Poppins', sans-serif;
   cursor: pointer;
   transition: all 0.3s ease;
   border: none;
-  user-select: none;
-  -webkit-user-select: none;
-  -webkit-touch-callout: none;
 }
 
 button:active {
   transform: scale(0.98);
 }
 
-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* ============================= */
-/* TEXT SELECTION */
-/* ============================= */
-
+/* Selection */
 ::selection {
   background-color: #00ff00;
   color: #0a0e27;
 }
 
-::-moz-selection {
-  background-color: #00ff00;
-  color: #0a0e27;
-}
-
-/* ============================= */
-/* ANIMATIONS */
-/* ============================= */
-
+/* Animations */
 @keyframes spin {
   to {
     transform: rotate(360deg);
@@ -197,81 +148,7 @@ button:disabled {
   animation: slideUp 0.3s ease-out;
 }
 
-@keyframes slideDown {
-  from {
-    transform: translateY(-10px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-.animate-slideDown {
-  animation: slideDown 0.3s ease-out;
-}
-
-@keyframes bounce {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-4px);
-  }
-}
-
-.animate-bounce {
-  animation: bounce 1s ease-in-out infinite;
-}
-
-/* ============================= */
-/* ACCESSIBILITY */
-/* ============================= */
-
-:focus-visible {
-  outline: 2px solid #00ff00;
-  outline-offset: 2px;
-}
-
-/* Prevent double tap zoom on buttons */
-button,
-a,
-input {
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  user-select: none;
-}
-
-/* ============================= */
-/* MOBILE OPTIMIZATION */
-/* ============================= */
-
-/* Safe Area Support for iPhone X+ */
-@supports (padding: max(0px)) {
-  body {
-    padding-left: max(12px, env(safe-area-inset-left));
-    padding-right: max(12px, env(safe-area-inset-right));
-  }
-
-  .safe-area-bottom {
-    padding-bottom: max(1rem, env(safe-area-inset-bottom));
-  }
-
-  .safe-area-top {
-    padding-top: max(1rem, env(safe-area-inset-top));
-  }
-}
-
-/* Smooth scrolling */
-html {
-  scroll-behavior: smooth;
-}
-
-/* ============================= */
-/* UTILITY CLASSES */
-/* ============================= */
-
+/* Utilities */
 .truncate {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -299,93 +176,16 @@ html {
   overflow: hidden;
 }
 
-.loading {
-  pointer-events: none;
-  opacity: 0.6;
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
-/* ============================= */
-/* CUSTOM FITNESS APP CLASSES */
-/* ============================= */
-
-.fitness-card {
-  @apply bg-dark-secondary border border-metallic border-opacity-30 rounded-lg;
-  @apply hover:border-accent hover:border-opacity-50 transition-colors;
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }
 
-.fitness-btn-primary {
-  @apply bg-accent hover:bg-green-400 text-dark font-bold;
-  @apply transition-all duration-300;
-}
-
-.fitness-btn-secondary {
-  @apply bg-dark-secondary border border-metallic border-opacity-30;
-  @apply hover:border-metallic hover:border-opacity-50 text-metallic font-bold;
-  @apply transition-all;
-}
-
-.fitness-badge {
-  @apply px-2 py-1 rounded-full text-xs font-bold;
-  @apply bg-accent bg-opacity-20 text-accent;
-}
-
-.fitness-stat {
-  @apply text-center;
-}
-
-.fitness-stat-value {
-  @apply text-2xl font-bold text-accent;
-}
-
-.fitness-stat-label {
-  @apply text-metallic text-xs font-bold;
-}
-
-/* ============================= */
-/* RESPONSIVE ADJUSTMENTS */
-/* ============================= */
-
-@media (max-width: 480px) {
-  body {
-    font-size: 14px;
-  }
-
-  h1 {
-    font-size: 1.5rem;
-  }
-
-  h2 {
-    font-size: 1.25rem;
-  }
-
-  h3 {
-    font-size: 1rem;
-  }
-}
-
-@media (min-width: 481px) {
-  h1 {
-    font-size: 2rem;
-  }
-
-  h2 {
-    font-size: 1.75rem;
-  }
-
-  h3 {
-    font-size: 1.5rem;
-  }
-}
-
-/* ============================= */
-/* SMOOTH TRANSITIONS */
-/* ============================= */
-
-* {
-  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
-}
-
-button,
-a {
-  transition: all 0.3s ease;
+/* Smooth scroll */
+html {
+  scroll-behavior: smooth;
 }

@@ -1,188 +1,14 @@
-/* App.css */
+/* App.css - Minimal styles */
 
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
-
-/* Tailwind Directives */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-html, body {
-  width: 100%;
-  height: 100%;
-  overflow-x: hidden;
-  font-family: 'Poppins', 'Inter', sans-serif;
-  background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0a0e27 100%);
-  color: #ffffff;
-}
-
-/* Typography */
-h1, h2, h3, h4, h5, h6 {
-  font-weight: 700;
-  letter-spacing: -0.5px;
-}
-
-p {
-  line-height: 1.6;
-}
-
-/* Scrollbar Styling */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #8b8b8b;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #b8b8b8;
-}
-
-/* Custom scrollbar for horizontal scroll */
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-/* Input Focus */
-input:focus,
-select:focus,
-textarea:focus {
-  outline: none;
-  border-color: #00ff00 !important;
-  box-shadow: 0 0 0 3px rgba(0, 255, 0, 0.1);
-}
-
-/* Button Base */
-button {
-  font-family: 'Poppins', sans-serif;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-button:active {
-  transform: scale(0.98);
-}
-
-/* Text Selection */
-::selection {
-  background-color: #00ff00;
-  color: #0a0e27;
-}
-
-/* Animations */
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.animate-spin {
-  animation: spin 1s linear infinite;
-}
-
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-}
-
-.animate-pulse {
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-.animate-fadeIn {
-  animation: fadeIn 0.3s ease-in;
-}
-
-@keyframes slideUp {
-  from {
-    transform: translateY(10px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-.animate-slideUp {
-  animation: slideUp 0.3s ease-out;
-}
-
-@keyframes slideDown {
-  from {
-    transform: translateY(-10px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-.animate-slideDown {
-  animation: slideDown 0.3s ease-out;
-}
-
-@keyframes bounce {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-4px);
-  }
-}
-
-.animate-bounce {
-  animation: bounce 1s ease-in-out infinite;
-}
-
-/* Mobile Container */
-#root {
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
-}
-
-/* Prevent Double Tap Zoom */
+/* Prevent double-tap zoom */
 button, a, input {
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   user-select: none;
 }
 
-/* Safe Area Support for iPhone X+ */
-@supports(padding: max(0px)) {
+/* Safe areas for notch devices */
+@supports (padding: max(0px)) {
   body {
     padding-left: max(12px, env(safe-area-inset-left));
     padding-right: max(12px, env(safe-area-inset-right));
@@ -193,125 +19,23 @@ button, a, input {
   }
 }
 
-/* Smooth Scrolling */
-html {
-  scroll-behavior: smooth;
-}
-
-/* Utilities */
-.truncate {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.line-clamp-1 {
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.line-clamp-2 {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.line-clamp-3 {
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-/* Smooth Transitions */
+/* Transitions */
 * {
   transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
-button,
-a {
+button, a {
   transition: all 0.3s ease;
 }
 
-/* Loading State */
+/* Loading state */
 .loading {
   pointer-events: none;
   opacity: 0.6;
 }
 
-/* Focus visible for accessibility */
+/* Focus visible */
 :focus-visible {
   outline: 2px solid #00ff00;
   outline-offset: 2px;
-}
-
-/* Gradient Backgrounds */
-.bg-gradient-dark {
-  background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0a0e27 100%);
-}
-
-.bg-gradient-accent {
-  background: linear-gradient(135deg, #00ff00 0%, #00cc00 100%);
-}
-
-/* Responsive Text */
-@media (max-width: 375px) {
-  h1 { font-size: 1.5rem; }
-  h2 { font-size: 1.25rem; }
-  h3 { font-size: 1rem; }
-}
-
-@media (min-width: 376px) {
-  h1 { font-size: 2rem; }
-  h2 { font-size: 1.75rem; }
-  h3 { font-size: 1.5rem; }
-}
-
-/* Custom Classes for Fitness App */
-.fitness-card {
-  @apply bg-dark-secondary border border-metallic border-opacity-30 rounded-lg;
-  @apply hover:border-accent hover:border-opacity-50 transition-colors;
-}
-
-.fitness-btn-primary {
-  @apply bg-accent hover:bg-green-400 text-dark font-bold;
-  @apply transition-all duration-300;
-}
-
-.fitness-btn-secondary {
-  @apply bg-dark-secondary border border-metallic border-opacity-30;
-  @apply hover:border-metallic hover:border-opacity-50 text-metallic font-bold;
-  @apply transition-all;
-}
-
-.fitness-badge {
-  @apply px-2 py-1 rounded-full text-xs font-bold;
-  @apply bg-accent bg-opacity-20 text-accent;
-}
-
-.fitness-stat {
-  @apply text-center;
-}
-
-.fitness-stat-value {
-  @apply text-2xl font-bold text-accent;
-}
-
-.fitness-stat-label {
-  @apply text-metallic text-xs font-bold;
-}
-
-/* Responsive Mobile First */
-@media (max-width: 480px) {
-  .max-w-md {
-    max-width: 100%;
-  }
-  
-  .px-6 {
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
 }
