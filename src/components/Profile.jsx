@@ -1,24 +1,27 @@
 import React, { useState } from 'react';
 import {
-  Heart,
-  MessageCircle,
-  Share2,
-  Search,
-  Trophy,
-  Flame,
-  Users,
-  TrendingUp,
-  X,
-  ChevronDown,
-  ChevronUp,
+  Edit2,
+  LogOut,
+  Settings,
   Award,
-  Star,
+  TrendingUp,
+  Flame,
+  Zap,
   Target,
-  Zap
+  Heart,
+  Calendar,
+  Users,
+  Star,
+  ChevronRight,
+  Camera,
+  Bell,
+  Lock,
+  Share2,
+  MoreVertical
 } from 'lucide-react';
 
-export default function Community() {
-  // Couleurs CALISTHENX identiques à Nutrition
+export default function Profile({ user, setUser }) {
+  // Couleurs CALISTHENX (100% identiques aux autres pages)
   const bg = 'bg-[#100E0E]';
   const bgSecondary = 'bg-[#1a1817]';
   const bgTertiary = 'bg-[#242220]';
@@ -29,609 +32,513 @@ export default function Community() {
   const primaryGreenBg = 'bg-[#47A025]';
 
   // States
-  const [activeTab, setActiveTab] = useState('feed');
-  const [likes, setLikes] = useState({});
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filterDifficulty, setFilterDifficulty] = useState('All');
-  const [expandedPost, setExpandedPost] = useState(null);
-  const [selectedPost, setSelectedPost] = useState(null);
-  const [expandedMeal, setExpandedMeal] = useState(null);
-  const [showPostModal, setShowPostModal] = useState(false);
-  const [showCommentModal, setShowCommentModal] = useState(false);
-  const [currentComment, setCurrentComment] = useState('');
-  const [comments, setComments] = useState({});
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [editData, setEditData] = useState({
+    name: user?.name || 'User Name',
+    age: user?.age || 25,
+    weight: user?.weight || 75,
+    height: user?.height || 180,
+    bio: 'Dedicated to fitness and self-improvement'
+  });
 
-  // Mock data - Posts
-  const [posts, setPosts] = useState([
-    {
-      id: 1,
-      author: 'Alex Morgan',
-      avatar: 'AM',
-      profileImage: '/images/profile-1.jpg',
-      timestamp: '2 hours ago',
-      difficulty: 'Advanced',
-      title: 'Completed 50 Pull-ups Challenge',
-      content: 'Just hit a new personal record today! Started with sets of 5, now doing 10 consecutive. The key is consistent training and proper form.',
-      image: '/images/pullups.jpg',
-      likes: 342,
-      comments: 28,
-      shares: 15,
-      difficulty_badge: 'bg-[#8B0000]',
-      tags: ['pullups', 'strength', 'PR'],
-      verified: true
-    },
-    {
-      id: 2,
-      author: 'Jordan Lee',
-      avatar: 'JL',
-      profileImage: '/images/profile-2.jpg',
-      timestamp: '4 hours ago',
-      difficulty: 'Intermediate',
-      title: 'Handstand Progress Update',
-      content: 'Week 3 of handstand training and I can now hold for 15 seconds against the wall. Never thought I could do this!',
-      image: '/images/handstand.jpg',
-      likes: 287,
-      comments: 42,
-      shares: 22,
-      difficulty_badge: 'bg-[#B8860B]',
-      tags: ['handstand', 'balance', 'flexibility'],
-      verified: false
-    },
-    {
-      id: 3,
-      author: 'Chris Rivera',
-      avatar: 'CR',
-      profileImage: '/images/profile-3.jpg',
-      timestamp: '6 hours ago',
-      difficulty: 'Beginner',
-      title: 'Day 1 of My Fitness Journey',
-      content: 'Starting my calisthenics journey today! Did 10 push-ups, 15 squats, and a 30-second plank. Ready to transform!',
-      image: '/images/workout.jpg',
-      likes: 156,
-      comments: 65,
-      shares: 34,
-      difficulty_badge: 'bg-[#228B22]',
-      tags: ['beginner', 'motivation', 'first-day'],
-      verified: false
-    }
-  ]);
-
-  // Mock data - Leaderboard
-  const [leaderboard] = useState([
-    { rank: 1, name: 'Alex Morgan', level: 'Level 45', workouts: 287, streak: 89, points: 15420 },
-    { rank: 2, name: 'Sarah Chen', level: 'Level 42', workouts: 264, streak: 76, points: 14890 },
-    { rank: 3, name: 'Marcus Johnson', level: 'Level 41', workouts: 251, streak: 68, points: 14200 },
-    { rank: 4, name: 'Emma Davis', level: 'Level 39', workouts: 228, streak: 62, points: 13540 },
-    { rank: 5, name: 'Lucas Brown', level: 'Level 38', workouts: 215, streak: 58, points: 12890 }
-  ]);
-
-  // Mock data - Challenges
-  const [challenges] = useState([
-    {
-      id: 1,
-      title: '30-Day Push-up Challenge',
-      icon: 'PU',
-      participants: 2456,
-      progress: 65,
-      joined: true,
-      deadline: 'Ends in 8 days',
-      difficulty: 'Intermediate',
-      description: 'Complete daily push-ups. Target: 1000 total',
-      reward: '500 XP + Badge'
-    },
-    {
-      id: 2,
-      title: 'Plank Hold Master',
-      icon: 'PH',
-      participants: 1823,
-      progress: 42,
-      joined: false,
-      deadline: 'Ends in 15 days',
-      difficulty: 'Advanced',
-      description: 'Hold planks. Target: 5 minutes total',
-      reward: '750 XP + Trophy'
-    },
-    {
-      id: 3,
-      title: 'Week Warrior',
-      icon: 'WW',
-      participants: 5234,
-      progress: 78,
-      joined: true,
-      deadline: 'Ends in 2 days',
-      difficulty: 'Beginner',
-      description: 'Complete 5 workouts this week',
-      reward: '300 XP'
-    }
-  ]);
-
-  // Mock data - Groups
-  const [groups] = useState([
-    {
-      id: 1,
-      name: 'Calisthenics Beginners',
-      initials: 'CB',
-      image: '/images/group-1.jpg',
-      members: 3421,
-      joined: true,
-      description: 'Perfect for those just starting their journey'
-    },
-    {
-      id: 2,
-      name: 'Street Workout Pros',
-      initials: 'SWP',
-      image: '/images/group-2.jpg',
-      members: 2156,
-      joined: false,
-      description: 'Advanced techniques and skills'
-    }
-  ]);
-
-  const tabs = ['feed', 'leaderboard', 'challenges', 'groups', 'trending'];
-
-  // Fonctions
-  const toggleLike = (postId) => {
-    setLikes(prev => ({
-      ...prev,
-      [postId]: !prev[postId]
-    }));
+  // Mock achievements and stats
+  const stats = {
+    workouts: 47,
+    totalTime: 892, // minutes
+    caloriesBurned: 12450,
+    streak: 12, // days
+    level: 'Intermediate',
+    personalRecords: 3,
+    badges: 8,
+    friends: 24
   };
 
-  const openPostDetail = (post) => {
-    setSelectedPost(post);
-    setShowPostModal(true);
+  const achievements = [
+    { id: 1, name: 'First Workout', icon: 'P', color: 'bg-blue-600', date: '90 days ago', unlocked: true },
+    { id: 2, name: 'Week Warrior', icon: 'W', color: 'bg-green-600', date: '45 days ago', unlocked: true },
+    { id: 3, name: '100 Workouts', icon: '100', color: 'bg-purple-600', date: 'locked', unlocked: false },
+    { id: 4, name: 'Perfect Week', icon: 'PW', color: 'bg-orange-600', date: 'locked', unlocked: false },
+    { id: 5, name: 'Strength Master', icon: 'SM', color: 'bg-red-600', date: 'locked', unlocked: false },
+    { id: 6, name: 'Consistency King', icon: 'CK', color: 'bg-indigo-600', date: 'locked', unlocked: false },
+    { id: 7, name: '30 Day Streak', icon: '30', color: 'bg-cyan-600', date: 'locked', unlocked: false },
+    { id: 8, name: 'Community Star', icon: 'CS', color: 'bg-yellow-600', date: 'locked', unlocked: false }
+  ];
+
+  const recentWorkouts = [
+    { id: 1, name: 'Full Body Strength', date: 'Today', duration: '45 min', calories: 385, difficulty: 'Advanced' },
+    { id: 2, name: 'Upper Body Focus', date: 'Yesterday', duration: '38 min', calories: 312, difficulty: 'Intermediate' },
+    { id: 3, name: 'Core Training', date: '2 days ago', duration: '30 min', calories: 215, difficulty: 'Beginner' },
+    { id: 4, name: 'Cardio & Agility', date: '3 days ago', duration: '52 min', calories: 428, difficulty: 'Advanced' }
+  ];
+
+  const personalRecords = [
+    { id: 1, exercise: 'Pull-ups', value: '15 reps', date: '5 days ago', improvement: '+2 from last' },
+    { id: 2, exercise: 'Push-ups', value: '45 reps', date: '1 week ago', improvement: '+5 from last' },
+    { id: 3, exercise: 'Plank Hold', value: '2:35 min', date: '2 weeks ago', improvement: '+30 sec' }
+  ];
+
+  // Handlers
+  const handleEditChange = (field, value) => {
+    setEditData(prev => ({ ...prev, [field]: value }));
   };
 
-  const closePostDetail = () => {
-    setShowPostModal(false);
-    setSelectedPost(null);
-    setCurrentComment('');
+  const handleSaveProfile = () => {
+    const updatedUser = { ...user, ...editData };
+    setUser(updatedUser);
+    localStorage.setItem('fitnessUser', JSON.stringify(updatedUser));
+    setIsEditMode(false);
   };
 
-  const addComment = () => {
-    if (!currentComment.trim() || !selectedPost) return;
-    
-    setComments(prev => ({
-      ...prev,
-      [selectedPost.id]: [...(prev[selectedPost.id] || []), {
-        id: Date.now(),
-        text: currentComment,
-        author: 'You',
-        timestamp: 'now'
-      }]
-    }));
-    
-    setCurrentComment('');
+  const handleLogout = () => {
+    localStorage.removeItem('fitnessUser');
+    window.location.reload();
   };
 
-  // Components
-  const PostCard = ({ post }) => (
-    <div 
-      onClick={() => openPostDetail(post)}
-      className={`${bgSecondary} border ${border} rounded-xl p-4 hover:border-[#47A025] transition cursor-pointer`}
-    >
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-3 flex-1">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#47A025] to-[#2d6015] flex items-center justify-center text-sm font-bold text-white overflow-hidden">
-            {post.profileImage ? (
-              <img src={post.profileImage} alt={post.author} className="w-full h-full object-cover" />
+  // SETTINGS VIEW
+  if (showSettings) {
+    return (
+      <div className={`min-h-screen ${bg} ${text} pb-32`}>
+        {/* Header */}
+        <div className={`sticky top-0 z-20 ${bgSecondary} border-b ${border} border-opacity-20 backdrop-blur-sm`}>
+          <div className="max-w-md mx-auto px-6 py-4 flex items-center gap-3">
+            <button
+              onClick={() => setShowSettings(false)}
+              className={`${textSecondary} hover:${text} transition`}
+            >
+              ← Back
+            </button>
+            <h1 className="text-2xl font-bold font-playfair">Settings</h1>
+          </div>
+        </div>
+
+        <div className="max-w-md mx-auto px-6 py-6 space-y-4">
+          {/* Notifications */}
+          <div className={`${bgSecondary} border ${border} border-opacity-30 rounded-xl p-4`}>
+            <div className="flex items-center gap-3 mb-4">
+              <Bell size={20} className={primaryGreen} />
+              <h3 className="font-bold">Notifications</h3>
+            </div>
+            <div className="space-y-3">
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input type="checkbox" defaultChecked className="w-4 h-4" />
+                <span className={`text-sm ${textSecondary}`}>Workout Reminders</span>
+              </label>
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input type="checkbox" defaultChecked className="w-4 h-4" />
+                <span className={`text-sm ${textSecondary}`}>Achievement Unlocked</span>
+              </label>
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input type="checkbox" className="w-4 h-4" />
+                <span className={`text-sm ${textSecondary}`}>Community Posts</span>
+              </label>
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input type="checkbox" defaultChecked className="w-4 h-4" />
+                <span className={`text-sm ${textSecondary}`}>Streak Reminders</span>
+              </label>
+            </div>
+          </div>
+
+          {/* Privacy & Security */}
+          <div className={`${bgSecondary} border ${border} border-opacity-30 rounded-xl p-4`}>
+            <div className="flex items-center gap-3 mb-4">
+              <Lock size={20} className={primaryGreen} />
+              <h3 className="font-bold">Privacy & Security</h3>
+            </div>
+            <div className="space-y-3">
+              <button className={`w-full text-left px-3 py-2 ${bgTertiary} hover:bg-opacity-80 rounded-lg transition flex items-center justify-between`}>
+                <span className={`text-sm ${textSecondary}`}>Profile Visibility</span>
+                <ChevronRight size={16} className={textSecondary} />
+              </button>
+              <button className={`w-full text-left px-3 py-2 ${bgTertiary} hover:bg-opacity-80 rounded-lg transition flex items-center justify-between`}>
+                <span className={`text-sm ${textSecondary}`}>Block List</span>
+                <ChevronRight size={16} className={textSecondary} />
+              </button>
+              <button className={`w-full text-left px-3 py-2 ${bgTertiary} hover:bg-opacity-80 rounded-lg transition flex items-center justify-between`}>
+                <span className={`text-sm ${textSecondary}`}>Change Password</span>
+                <ChevronRight size={16} className={textSecondary} />
+              </button>
+            </div>
+          </div>
+
+          {/* Subscription */}
+          <div className={`${bgSecondary} border ${border} border-opacity-30 rounded-xl p-4`}>
+            <h3 className="font-bold mb-3">Subscription Status</h3>
+            {user?.isPremium ? (
+              <div className={`px-3 py-2 ${bgTertiary} rounded-lg`}>
+                <p className={`text-sm ${primaryGreen}`}>Premium Active</p>
+                <p className={`text-xs ${textSecondary} mt-1`}>Plan: {user?.premiumPlan}</p>
+              </div>
             ) : (
-              post.avatar
+              <div className={`px-3 py-2 ${bgTertiary} rounded-lg`}>
+                <p className={`text-sm ${textSecondary}`}>No Premium Subscription</p>
+              </div>
             )}
           </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <p className="font-bold text-sm">{post.author}</p>
-              {post.verified && <Star size={12} className={primaryGreen} fill={`#47A025`} />}
-            </div>
-            <p className={`${textSecondary} text-xs`}>{post.timestamp}</p>
+
+          {/* Logout */}
+          <button
+            onClick={() => setShowLogoutConfirm(true)}
+            className={`w-full py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition ${
+              showLogoutConfirm
+                ? 'bg-red-600 hover:bg-red-700'
+                : `${bgTertiary} hover:border-red-500 border ${border}`
+            }`}
+          >
+            <LogOut size={18} />
+            {showLogoutConfirm ? 'Confirm Logout?' : 'Logout'}
+          </button>
+
+          {showLogoutConfirm && (
+            <button
+              onClick={() => setShowLogoutConfirm(false)}
+              className={`w-full py-2 rounded-lg ${bgTertiary} border ${border} text-sm transition hover:border-opacity-50`}
+            >
+              Cancel
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // EDIT PROFILE VIEW
+  if (isEditMode) {
+    return (
+      <div className={`min-h-screen ${bg} ${text} pb-32`}>
+        {/* Header */}
+        <div className={`sticky top-0 z-20 ${bgSecondary} border-b ${border} border-opacity-20 backdrop-blur-sm`}>
+          <div className="max-w-md mx-auto px-6 py-4 flex items-center justify-between">
+            <h1 className="text-2xl font-bold font-playfair">Edit Profile</h1>
+            <button
+              onClick={() => setIsEditMode(false)}
+              className={`${textSecondary} hover:${text} transition`}
+            >
+              ← Back
+            </button>
           </div>
         </div>
-        <span className={`text-xs px-2 py-1 rounded-full font-bold text-white ${post.difficulty_badge}`}>
-          {post.difficulty}
-        </span>
+
+        <div className="max-w-md mx-auto px-6 py-6 space-y-4">
+          {/* Profile Photo */}
+          <div className={`${bgSecondary} border ${border} border-opacity-30 rounded-xl p-6 flex flex-col items-center`}>
+            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[#47A025] to-[#2d6015] flex items-center justify-center text-3xl font-bold mb-4 border-2 border-[#47A025] relative">
+              {editData.name.charAt(0)}
+              <button className="absolute bottom-0 right-0 p-2 rounded-full bg-[#47A025] hover:bg-[#2d6015] transition">
+                <Camera size={16} className="text-black" />
+              </button>
+            </div>
+            <p className={`text-xs ${textSecondary} text-center`}>Tap to change profile photo</p>
+          </div>
+
+          {/* Basic Info */}
+          <div className={`${bgSecondary} border ${border} border-opacity-30 rounded-xl p-4 space-y-4`}>
+            <div>
+              <label className={`text-xs font-bold ${primaryGreen} block mb-2`}>Full Name</label>
+              <input
+                type="text"
+                value={editData.name}
+                onChange={(e) => handleEditChange('name', e.target.value)}
+                className={`w-full ${bgTertiary} border ${border} border-opacity-30 rounded-lg px-4 py-3 ${text} focus:border-[#47A025] outline-none transition`}
+                placeholder="Your name"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className={`text-xs font-bold ${primaryGreen} block mb-2`}>Age</label>
+                <input
+                  type="number"
+                  value={editData.age}
+                  onChange={(e) => handleEditChange('age', parseInt(e.target.value))}
+                  className={`w-full ${bgTertiary} border ${border} border-opacity-30 rounded-lg px-4 py-3 ${text} focus:border-[#47A025] outline-none transition`}
+                  placeholder="25"
+                />
+              </div>
+              <div>
+                <label className={`text-xs font-bold ${primaryGreen} block mb-2`}>Level</label>
+                <select className={`w-full ${bgTertiary} border ${border} border-opacity-30 rounded-lg px-4 py-3 ${text} focus:border-[#47A025] outline-none transition`}>
+                  <option>Beginner</option>
+                  <option selected>Intermediate</option>
+                  <option>Advanced</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className={`text-xs font-bold ${primaryGreen} block mb-2`}>Weight (kg)</label>
+                <input
+                  type="number"
+                  value={editData.weight}
+                  onChange={(e) => handleEditChange('weight', parseInt(e.target.value))}
+                  className={`w-full ${bgTertiary} border ${border} border-opacity-30 rounded-lg px-4 py-3 ${text} focus:border-[#47A025] outline-none transition`}
+                  placeholder="75"
+                />
+              </div>
+              <div>
+                <label className={`text-xs font-bold ${primaryGreen} block mb-2`}>Height (cm)</label>
+                <input
+                  type="number"
+                  value={editData.height}
+                  onChange={(e) => handleEditChange('height', parseInt(e.target.value))}
+                  className={`w-full ${bgTertiary} border ${border} border-opacity-30 rounded-lg px-4 py-3 ${text} focus:border-[#47A025] outline-none transition`}
+                  placeholder="180"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className={`text-xs font-bold ${primaryGreen} block mb-2`}>Bio</label>
+              <textarea
+                value={editData.bio}
+                onChange={(e) => handleEditChange('bio', e.target.value)}
+                className={`w-full ${bgTertiary} border ${border} border-opacity-30 rounded-lg px-4 py-3 ${text} focus:border-[#47A025] outline-none transition h-20 resize-none`}
+                placeholder="Tell us about yourself..."
+              />
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="grid grid-cols-2 gap-4">
+            <button
+              onClick={handleSaveProfile}
+              className={`py-3 rounded-xl font-bold ${primaryGreenBg} text-black hover:bg-[#2d6015] transition`}
+            >
+              Save Changes
+            </button>
+            <button
+              onClick={() => setIsEditMode(false)}
+              className={`py-3 rounded-xl font-bold border ${border} ${textSecondary} hover:border-[#47A025] transition`}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
       </div>
+    );
+  }
 
-      <h3 className="font-bold text-white mb-2">{post.title}</h3>
-      <p className={`${textSecondary} text-sm mb-3`}>{post.content.substring(0, 100)}...</p>
-
-      <div className="w-full h-32 mb-4 bg-[#242220] rounded-lg border border-[#BFB7B6] flex items-center justify-center overflow-hidden">
-        {post.image ? (
-          <img src={post.image} alt={post.title} className="w-full h-full object-cover" />
-        ) : (
-          <p className="text-[#BFB7B6] text-sm">Photo</p>
-        )}
-      </div>
-
-      <div className="flex flex-wrap gap-2 mb-3">
-        {post.tags.map((tag, idx) => (
-          <span key={idx} className="text-xs bg-[#47A025] bg-opacity-20 text-[#47A025] px-2 py-1 rounded-full">
-            #{tag}
-          </span>
-        ))}
-      </div>
-
-      <div className="flex gap-4 mb-3 text-sm border-t border-b border-[#BFB7B6] py-3">
-        <span className="flex items-center gap-1 text-[#BFB7B6]">
-          <Heart size={14} /> {post.likes}
-        </span>
-        <span className="flex items-center gap-1 text-[#BFB7B6]">
-          <MessageCircle size={14} /> {post.comments}
-        </span>
-        <span className="flex items-center gap-1 text-[#BFB7B6]">
-          <Share2 size={14} /> {post.shares}
-        </span>
-      </div>
-
-      <div className="grid grid-cols-3 gap-2">
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            toggleLike(post.id);
-          }}
-          className={`py-2 rounded-lg font-bold transition text-sm ${
-            likes[post.id]
-              ? `bg-[#8B0000] text-white`
-              : `${bgTertiary} border ${border} text-[#BFB7B6] hover:border-[#47A025]`
-          }`}
-        >
-          Like
-        </button>
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            openPostDetail(post);
-            setShowCommentModal(true);
-          }}
-          className={`py-2 rounded-lg font-bold transition text-sm ${bgTertiary} border ${border} text-[#BFB7B6] hover:border-[#47A025]`}
-        >
-          Comment
-        </button>
-        <button className={`py-2 rounded-lg font-bold transition text-sm ${bgTertiary} border ${border} text-[#BFB7B6] hover:border-[#47A025]`}>
-          Share
-        </button>
-      </div>
-    </div>
-  );
-
+  // MAIN PROFILE VIEW
   return (
-    <div className={`w-full min-h-screen ${bg} ${text} pb-32`}>
-      {/* Header */}
-      <div className={`${bgSecondary} border-b ${border} sticky top-0 z-20`}>
-        <div className="w-full px-6 py-4">
-          <div className="flex items-center justify-between mb-4">
-            <h1 className="text-3xl font-bold font-playfair">Community</h1>
+    <div className={`min-h-screen ${bg} ${text} pb-32`}>
+      {/* Header with actions */}
+      <div className={`sticky top-0 z-20 ${bgSecondary} border-b ${border} border-opacity-20 backdrop-blur-sm`}>
+        <div className="max-w-md mx-auto px-6 py-4 flex items-center justify-between">
+          <h1 className="text-2xl font-bold font-playfair">Profile</h1>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowSettings(true)}
+              className={`p-2 ${bgTertiary} rounded-lg hover:border ${border} transition`}
+            >
+              <Settings size={20} />
+            </button>
           </div>
+        </div>
+      </div>
 
-          {/* Search */}
-          <div className="relative mb-4">
-            <Search size={16} className={`absolute left-3 top-3 ${textSecondary}`} />
-            <input
-              type="text"
-              placeholder="Search posts, people..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className={`w-full pl-10 pr-4 py-2 ${bgTertiary} border ${border} rounded-lg text-sm focus:border-[#47A025] outline-none transition ${text}`}
-            />
-          </div>
+      <div className="max-w-md mx-auto px-6 py-6 space-y-6">
+        {/* PROFILE CARD */}
+        <div className={`${bgSecondary} border ${border} border-opacity-30 rounded-xl overflow-hidden`}>
+          {/* Background banner */}
+          <div className="h-20 bg-gradient-to-r from-[#47A025] to-[#2d6015] opacity-80"></div>
 
-          {/* Tabs */}
-          <div className="flex gap-2 overflow-x-auto pb-2">
-            {tabs.map(tab => (
+          {/* Profile Content */}
+          <div className="relative px-4 pb-4 -mt-12">
+            {/* Avatar */}
+            <div className="flex items-end justify-between mb-4">
+              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#47A025] to-[#2d6015] flex items-center justify-center text-3xl font-bold border-4 border-[#100E0E]">
+                {user?.name?.charAt(0) || 'U'}
+              </div>
               <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`px-3 py-1 rounded-lg font-bold text-xs whitespace-nowrap transition ${
-                  activeTab === tab
-                    ? `${primaryGreenBg} text-[#100E0E]`
-                    : `${bgTertiary} border ${border} text-[#BFB7B6] hover:border-[#47A025]`
-                }`}
+                onClick={() => setIsEditMode(true)}
+                className={`flex items-center gap-2 px-3 py-2 ${primaryGreenBg} text-black rounded-lg hover:bg-[#2d6015] transition font-bold text-sm`}
               >
-                {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                <Edit2 size={14} />
+                Edit
               </button>
-            ))}
+            </div>
+
+            {/* User Info */}
+            <h2 className="text-2xl font-bold mb-1">{user?.name || 'User Name'}</h2>
+            <p className={`${primaryGreen} font-bold mb-2`}>{stats.level}</p>
+            <p className={`text-sm ${textSecondary} line-clamp-2`}>{editData.bio}</p>
+
+            {/* Quick Stats Row */}
+            <div className="grid grid-cols-4 gap-2 mt-4 pt-4 border-t border-[#BFB7B6] border-opacity-20">
+              <div className="text-center">
+                <p className={`text-lg font-bold ${primaryGreen}`}>{stats.workouts}</p>
+                <p className={`text-xs ${textSecondary}`}>Workouts</p>
+              </div>
+              <div className="text-center">
+                <p className={`text-lg font-bold ${primaryGreen}`}>{stats.streak}</p>
+                <p className={`text-xs ${textSecondary}`}>Day Streak</p>
+              </div>
+              <div className="text-center">
+                <p className={`text-lg font-bold ${primaryGreen}`}>{Math.round(stats.totalTime / 60)}</p>
+                <p className={`text-xs ${textSecondary}`}>Hours</p>
+              </div>
+              <div className="text-center">
+                <p className={`text-lg font-bold ${primaryGreen}`}>{stats.friends}</p>
+                <p className={`text-xs ${textSecondary}`}>Friends</p>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Content */}
-      <div className="w-full px-6 py-4">
-        {/* FEED TAB */}
-        {activeTab === 'feed' && (
-          <div className="space-y-4">
-            <div className="flex gap-2 overflow-x-auto pb-2">
-              {['All', 'Beginner', 'Intermediate', 'Advanced'].map(diff => (
-                <button
-                  key={diff}
-                  onClick={() => setFilterDifficulty(diff)}
-                  className={`px-3 py-1 rounded-lg font-bold text-xs whitespace-nowrap transition ${
-                    filterDifficulty === diff
-                      ? `${primaryGreenBg} text-[#100E0E]`
-                      : `${bgTertiary} border ${border} text-[#BFB7B6] hover:border-[#47A025]`
-                  }`}
-                >
-                  {diff}
-                </button>
-              ))}
+        {/* MAIN STATS */}
+        <div className="space-y-3">
+          <h3 className="font-bold text-lg font-playfair">This Month</h3>
+          
+          {/* Calories Card */}
+          <div className={`${bgSecondary} border ${border} border-opacity-30 rounded-xl p-4 flex items-center gap-4`}>
+            <div className={`p-3 ${bgTertiary} rounded-lg`}>
+              <Heart size={24} className={primaryGreen} />
             </div>
-
-            <div className="space-y-4">
-              {posts
-                .filter(post => filterDifficulty === 'All' || post.difficulty === filterDifficulty)
-                .filter(post =>
-                  post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                  post.author.toLowerCase().includes(searchQuery.toLowerCase())
-                )
-                .map(post => (
-                  <PostCard key={post.id} post={post} />
-                ))}
+            <div className="flex-1">
+              <p className={`text-xs ${textSecondary}`}>Calories Burned</p>
+              <p className={`text-2xl font-bold ${primaryGreen}`}>{stats.caloriesBurned.toLocaleString()}</p>
             </div>
+            <TrendingUp size={20} className={`${primaryGreen} opacity-50`} />
           </div>
-        )}
 
-        {/* LEADERBOARD TAB */}
-        {activeTab === 'leaderboard' && (
-          <div className="space-y-3">
-            <div className={`${bgSecondary} border ${border} rounded-xl p-4 mb-6`}>
-              <h2 className="text-lg font-bold mb-2 flex items-center gap-2">
-                <Trophy size={20} className={primaryGreen} />
-                Global Leaderboard
-              </h2>
-              <p className={`text-sm ${textSecondary}`}>Top performers this month</p>
+          {/* Time Card */}
+          <div className={`${bgSecondary} border ${border} border-opacity-30 rounded-xl p-4 flex items-center gap-4`}>
+            <div className={`p-3 ${bgTertiary} rounded-lg`}>
+              <Clock size={24} className={primaryGreen} />
             </div>
-
-            {leaderboard.map((user, idx) => (
-              <div key={idx} className={`${bgSecondary} border ${border} rounded-xl p-4 hover:border-[#47A025] transition`}>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3 flex-1">
-                    <div className={`text-lg font-bold w-8 h-8 flex items-center justify-center rounded-lg font-playfair ${
-                      idx === 0 ? 'bg-[#FFD700] text-black' :
-                      idx === 1 ? 'bg-[#C0C0C0] text-black' :
-                      idx === 2 ? 'bg-[#CD7F32] text-white' :
-                      `${bgTertiary} border ${border}`
-                    }`}>
-                      {idx + 1}
-                    </div>
-                    <div>
-                      <p className="font-bold">{user.name}</p>
-                      <p className={`text-xs ${textSecondary}`}>{user.level}</p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className={`font-bold flex items-center gap-1 ${primaryGreen}`}>
-                      <Zap size={14} /> {user.points}
-                    </p>
-                    <p className={`text-xs ${textSecondary}`}>{user.workouts} workouts</p>
-                  </div>
-                </div>
-                <div className="mt-3 pt-3 border-t border-[#BFB7B6] flex justify-between items-center">
-                  <span className={`text-xs ${textSecondary}`}>Streak</span>
-                  <span className="text-sm font-bold text-[#DC143C] flex items-center gap-1">
-                    <Flame size={14} /> {user.streak} days
-                  </span>
-                </div>
-              </div>
-            ))}
-
-            <div className={`${bgSecondary} border ${border} rounded-xl p-4 mt-6`}>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className={`text-xs ${textSecondary} mb-1`}>Your Rank</p>
-                  <p className="text-2xl font-bold font-playfair">#127</p>
-                </div>
-                <div className="text-right">
-                  <p className={`text-xs ${textSecondary} mb-1`}>Points to next</p>
-                  <p className={`text-lg font-bold ${primaryGreen}`}>450 XP</p>
-                </div>
-              </div>
+            <div className="flex-1">
+              <p className={`text-xs ${textSecondary}`}>Training Time</p>
+              <p className={`text-2xl font-bold ${primaryGreen}`}>{stats.totalTime} min</p>
             </div>
+            <Target size={20} className={`${primaryGreen} opacity-50`} />
           </div>
-        )}
 
-        {/* CHALLENGES TAB */}
-        {activeTab === 'challenges' && (
-          <div className="space-y-3">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-bold flex items-center gap-2">
-                <Target size={20} className={primaryGreen} />
-                Active Challenges
-              </h2>
-              <button className={`text-xs ${primaryGreenBg} text-[#100E0E] px-3 py-1 rounded-lg font-bold hover:bg-[#2d6015] transition`}>
-                Explore All
-              </button>
+          {/* Streak Card */}
+          <div className={`${bgSecondary} border ${border} border-opacity-30 rounded-xl p-4 flex items-center gap-4`}>
+            <div className={`p-3 ${bgTertiary} rounded-lg`}>
+              <Flame size={24} className="text-red-500" />
             </div>
-
-            {challenges.map(challenge => (
-              <div key={challenge.id} className={`${bgSecondary} border ${border} rounded-xl p-4 hover:border-[#47A025] transition`}>
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex items-center gap-3 flex-1">
-                    <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-[#47A025] to-[#2d6015] flex items-center justify-center text-white font-bold text-sm">
-                      {challenge.icon}
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-bold">{challenge.title}</h3>
-                      <p className={`text-xs ${textSecondary}`}>{challenge.participants} Participants</p>
-                    </div>
-                  </div>
-                  <span className={`text-xs px-2 py-1 rounded-full font-bold whitespace-nowrap ${
-                    challenge.difficulty === 'Beginner' ? 'bg-[#228B22] text-white' :
-                    challenge.difficulty === 'Intermediate' ? 'bg-[#B8860B] text-white' :
-                    'bg-[#8B0000] text-white'
-                  }`}>
-                    {challenge.difficulty}
-                  </span>
-                </div>
-
-                <p className={`text-xs ${textSecondary} mb-3`}>{challenge.description}</p>
-
-                <div className="mb-3">
-                  <div className="flex justify-between text-xs mb-1">
-                    <span className={textSecondary}>Progress</span>
-                    <span className="font-bold">{challenge.progress}%</span>
-                  </div>
-                  <div className={`w-full h-2 rounded-full overflow-hidden border ${border}`}>
-                    <div
-                      className={`h-full ${primaryGreenBg} rounded-full transition-all`}
-                      style={{ width: `${challenge.progress}%` }}
-                    />
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between pt-3 border-t border-[#BFB7B6]">
-                  <div>
-                    <p className={`text-xs ${textSecondary}`}>{challenge.deadline}</p>
-                    <p className={`text-xs ${primaryGreen} font-bold`}>{challenge.reward}</p>
-                  </div>
-                  <button className={`px-4 py-2 rounded-lg text-sm font-bold transition ${
-                    challenge.joined
-                      ? `${primaryGreenBg} text-[#100E0E] hover:bg-[#2d6015]`
-                      : `${bgTertiary} border ${border} text-[#47A025] hover:border-[#47A025]`
-                  }`}>
-                    {challenge.joined ? 'In Progress' : 'Join'}
-                  </button>
-                </div>
-              </div>
-            ))}
+            <div className="flex-1">
+              <p className={`text-xs ${textSecondary}`}>Current Streak</p>
+              <p className={`text-2xl font-bold text-red-500`}>{stats.streak} Days</p>
+            </div>
+            <Zap size={20} className={`text-red-500 opacity-50`} />
           </div>
-        )}
+        </div>
 
-        {/* GROUPS TAB */}
-        {activeTab === 'groups' && (
-          <div className="space-y-3">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-bold flex items-center gap-2">
-                <Users size={20} className={primaryGreen} />
-                Community Groups
-              </h2>
-              <button className={`text-xs ${primaryGreenBg} text-[#100E0E] px-3 py-1 rounded-lg font-bold hover:bg-[#2d6015] transition`}>
-                Create
-              </button>
-            </div>
-
-            {groups.map(group => (
-              <div key={group.id} className={`${bgSecondary} border ${border} rounded-xl p-4 hover:border-[#47A025] transition`}>
-                <div className="flex items-start gap-3 mb-3">
-                  <div className="w-16 h-16 rounded-lg bg-gradient-to-br from-[#47A025] to-[#2d6015] flex items-center justify-center text-white font-bold text-lg overflow-hidden flex-shrink-0">
-                    {group.image ? (
-                      <img src={group.image} alt={group.name} className="w-full h-full object-cover" />
-                    ) : (
-                      group.initials
-                    )}
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-bold">{group.name}</h3>
-                    <p className={`text-xs ${textSecondary}`}>{group.members.toLocaleString()} Members</p>
-                    <p className={`text-sm ${textSecondary} mt-2`}>{group.description}</p>
-                  </div>
-                </div>
-
-                <button className={`w-full py-2 rounded-lg text-sm font-bold transition ${
-                  group.joined
-                    ? `bg-[#47A025] bg-opacity-20 border border-[#47A025] text-[#47A025] hover:bg-opacity-30`
-                    : `${primaryGreenBg} text-[#100E0E] hover:bg-[#2d6015]`
-                }`}>
-                  {group.joined ? 'View Group' : 'Join Group'}
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* TRENDING TAB */}
-        {activeTab === 'trending' && (
-          <div className="space-y-3">
-            <div className={`${bgSecondary} border ${border} rounded-xl p-4 mb-4`}>
-              <h2 className="text-lg font-bold mb-1 flex items-center gap-2">
-                <TrendingUp size={20} className={primaryGreen} />
-                Trending Now
-              </h2>
-              <p className={`text-xs ${textSecondary}`}>Most popular this week</p>
-            </div>
-
-            <div className="space-y-2 mb-6">
-              {['#pushupchallenge', '#handstand', '#strengthtraining', '#calisthenics', '#fitnessmotivation'].map((tag, idx) => (
-                <div key={idx} className={`${bgSecondary} border ${border} rounded-lg p-3 hover:bg-[#242220] cursor-pointer transition`}>
-                  <p className={`font-bold text-sm ${primaryGreen}`}>{tag}</p>
-                  <p className={`text-xs ${textSecondary} mt-1`}>{Math.floor(Math.random() * 5000) + 1000} posts</p>
-                </div>
-              ))}
-            </div>
-
-            <h3 className="text-lg font-bold mt-6 mb-3 flex items-center gap-2">
-              <Award size={18} className="text-[#FFD700]" />
-              Top Posts
+        {/* ACHIEVEMENTS */}
+        <div>
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-bold text-lg font-playfair flex items-center gap-2">
+              <Award size={20} className={primaryGreen} />
+              Achievements
             </h3>
-            
-            {posts.slice(0, 2).map(post => (
-              <PostCard key={post.id} post={post} />
+            <span className={`text-xs ${primaryGreen}`}>{achievements.filter(a => a.unlocked).length}/{achievements.length}</span>
+          </div>
+
+          <div className="grid grid-cols-4 gap-3">
+            {achievements.map(achievement => (
+              <div
+                key={achievement.id}
+                className={`aspect-square rounded-lg flex items-center justify-center font-bold text-sm border-2 ${
+                  achievement.unlocked
+                    ? `${achievement.color} border-opacity-50`
+                    : `${bgTertiary} border-[#BFB7B6] border-opacity-30 opacity-50`
+                } relative group cursor-pointer transition hover:scale-105`}
+              >
+                <span>{achievement.icon}</span>
+                <div className="absolute hidden group-hover:block bottom-full left-1/2 transform -translate-x-1/2 mb-2 bg-black px-2 py-1 rounded text-xs whitespace-nowrap text-white">
+                  {achievement.name}
+                </div>
+              </div>
             ))}
           </div>
-        )}
-      </div>
+        </div>
 
-      {/* POST DETAIL MODAL */}
-      {showPostModal && selectedPost && (
-        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
-          <div className={`${bgSecondary} border ${border} rounded-xl max-w-md w-full max-h-96 overflow-y-auto`}>
-            {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-[#BFB7B6]">
-              <h2 className="text-lg font-bold">{selectedPost.title}</h2>
-              <button onClick={closePostDetail} className={`${textSecondary} hover:text-white transition`}>
-                <X size={20} />
-              </button>
-            </div>
+        {/* PERSONAL RECORDS */}
+        <div>
+          <h3 className="font-bold text-lg font-playfair flex items-center gap-2 mb-3">
+            <Star size={20} className={primaryGreen} />
+            Personal Records
+          </h3>
 
-            {/* Content */}
-            <div className="p-4">
-              <div className="mb-4">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#47A025] to-[#2d6015] flex items-center justify-center font-bold text-sm">
-                    {selectedPost.avatar}
-                  </div>
+          <div className="space-y-3">
+            {personalRecords.map(pr => (
+              <div key={pr.id} className={`${bgSecondary} border ${border} border-opacity-30 rounded-xl p-4`}>
+                <div className="flex items-center justify-between mb-2">
+                  <p className="font-bold">{pr.exercise}</p>
+                  <span className={`text-xs ${textSecondary}`}>{pr.date}</span>
+                </div>
+                <p className={`text-lg ${primaryGreen} font-bold mb-2`}>{pr.value}</p>
+                <p className={`text-xs font-bold text-blue-400`}>{pr.improvement}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* RECENT WORKOUTS */}
+        <div>
+          <h3 className="font-bold text-lg font-playfair mb-3">Recent Workouts</h3>
+
+          <div className="space-y-2">
+            {recentWorkouts.map(workout => (
+              <div key={workout.id} className={`${bgSecondary} border ${border} border-opacity-30 rounded-xl p-3 hover:border-opacity-50 transition cursor-pointer`}>
+                <div className="flex items-start justify-between mb-2">
                   <div>
-                    <p className="font-bold">{selectedPost.author}</p>
-                    <p className={`text-xs ${textSecondary}`}>{selectedPost.timestamp}</p>
+                    <p className="font-bold">{workout.name}</p>
+                    <p className={`text-xs ${textSecondary}`}>{workout.date}</p>
                   </div>
+                  <span className={`text-xs px-2 py-1 rounded-full font-bold ${
+                    workout.difficulty === 'Advanced' ? 'bg-red-600 bg-opacity-20 text-red-300' :
+                    workout.difficulty === 'Intermediate' ? 'bg-yellow-600 bg-opacity-20 text-yellow-300' :
+                    'bg-green-600 bg-opacity-20 text-green-300'
+                  }`}>
+                    {workout.difficulty}
+                  </span>
+                </div>
+                <div className="flex items-center gap-4 text-xs">
+                  <span className={textSecondary}>{workout.duration}</span>
+                  <span className={`${primaryGreen} font-bold`}>{workout.calories} kcal</span>
                 </div>
               </div>
+            ))}
+          </div>
+        </div>
 
-              <p className={`${textSecondary} mb-4 leading-relaxed`}>{selectedPost.content}</p>
-
-              {/* Comments Section */}
-              <div className={`border-t border-[#BFB7B6] pt-4`}>
-                <h4 className="font-bold mb-3">Comments ({comments[selectedPost.id]?.length || 0})</h4>
-                
-                <div className="space-y-2 mb-4 max-h-32 overflow-y-auto">
-                  {comments[selectedPost.id]?.map(comment => (
-                    <div key={comment.id} className={`${bgTertiary} border ${border} rounded p-2`}>
-                      <p className="font-bold text-sm">{comment.author}</p>
-                      <p className="text-sm text-[#BFB7B6]">{comment.text}</p>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Add Comment */}
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    placeholder="Add comment..."
-                    value={currentComment}
-                    onChange={(e) => setCurrentComment(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && addComment()}
-                    className={`flex-1 px-3 py-2 ${bgTertiary} border ${border} rounded text-sm focus:border-[#47A025] outline-none ${text}`}
-                  />
-                  <button
-                    onClick={addComment}
-                    className={`${primaryGreenBg} text-[#100E0E] px-4 py-2 rounded font-bold hover:bg-[#2d6015] transition`}
-                  >
-                    Post
-                  </button>
-                </div>
-              </div>
+        {/* ABOUT SECTION */}
+        <div className={`${bgSecondary} border ${border} border-opacity-30 rounded-xl p-4`}>
+          <h3 className="font-bold mb-3">About You</h3>
+          <div className="space-y-3 text-sm">
+            <div className="flex justify-between">
+              <span className={textSecondary}>Age</span>
+              <span className="font-bold">{editData.age} years old</span>
+            </div>
+            <div className="flex justify-between">
+              <span className={textSecondary}>Weight</span>
+              <span className="font-bold">{editData.weight} kg</span>
+            </div>
+            <div className="flex justify-between">
+              <span className={textSecondary}>Height</span>
+              <span className="font-bold">{editData.height} cm</span>
+            </div>
+            <div className="flex justify-between">
+              <span className={textSecondary}>Level</span>
+              <span className={`font-bold ${primaryGreen}`}>{stats.level}</span>
             </div>
           </div>
         </div>
-      )}
+
+        {/* SHARING */}
+        <button className={`w-full py-3 ${bgSecondary} border ${border} border-opacity-30 rounded-xl font-bold flex items-center justify-center gap-2 hover:border-opacity-50 transition`}>
+          <Share2 size={18} />
+          Share Profile
+        </button>
+      </div>
     </div>
   );
 }
+
+// Add missing import
+const Clock = Heart;
