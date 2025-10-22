@@ -1,484 +1,637 @@
-// src/components/Profile.jsx
-
 import React, { useState } from 'react';
-import { Camera, Edit2, LogOut, Bell, Shield, HelpCircle, Trash2, Save, X, TrendingUp, Target, ChevronRight, Settings, Share2, Mail, Phone, MapPin } from 'lucide-react';
+import {
+  Heart,
+  MessageCircle,
+  Share2,
+  Search,
+  Trophy,
+  Flame,
+  Users,
+  TrendingUp,
+  X,
+  ChevronDown,
+  ChevronUp,
+  Award,
+  Star,
+  Target,
+  Zap
+} from 'lucide-react';
 
-export default function Profile({ user, setUser }) {
-  const [isEditing, setIsEditing] = useState(false);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [formData, setFormData] = useState({
-    name: user?.name || 'Athlete',
-    weight: user?.weight || 75,
-    height: user?.height || 180,
-    age: user?.age || 25,
-    experience: user?.experience || 'Intermediate',
-    gender: user?.gender || 'Male',
-    email: user?.email || 'athlete@fitness.com',
-    phone: user?.phone || '+1 (555) 123-4567',
-    location: user?.location || 'San Francisco, CA',
-    goals: user?.goals || ['Strength', 'Muscle']
-  });
+export default function Community() {
+  // Couleurs CALISTHENX identiques à Nutrition
+  const bg = 'bg-[#100E0E]';
+  const bgSecondary = 'bg-[#1a1817]';
+  const bgTertiary = 'bg-[#242220]';
+  const text = 'text-white';
+  const textSecondary = 'text-[#BFB7B6]';
+  const border = 'border-[#BFB7B6]';
+  const primaryGreen = 'text-[#47A025]';
+  const primaryGreenBg = 'bg-[#47A025]';
 
-  const calculateBMI = () => {
-    const heightInMeters = formData.height / 100;
-    return (formData.weight / (heightInMeters * heightInMeters)).toFixed(1);
-  };
+  // States
+  const [activeTab, setActiveTab] = useState('feed');
+  const [likes, setLikes] = useState({});
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterDifficulty, setFilterDifficulty] = useState('All');
+  const [expandedPost, setExpandedPost] = useState(null);
+  const [selectedPost, setSelectedPost] = useState(null);
+  const [expandedMeal, setExpandedMeal] = useState(null);
+  const [showPostModal, setShowPostModal] = useState(false);
+  const [showCommentModal, setShowCommentModal] = useState(false);
+  const [currentComment, setCurrentComment] = useState('');
+  const [comments, setComments] = useState({});
 
-  const getBMICategory = (bmi) => {
-    if (bmi < 18.5) return { category: 'Underweight', color: 'text-blue-400' };
-    if (bmi < 25) return { category: 'Normal', color: 'text-green-400' };
-    if (bmi < 30) return { category: 'Overweight', color: 'text-yellow-400' };
-    return { category: 'Obese', color: 'text-red-400' };
-  };
-
-  const bmi = calculateBMI();
-  const bmiInfo = getBMICategory(bmi);
-
-  const handleSave = () => {
-    const updatedUser = {
-      ...user,
-      ...formData
-    };
-    setUser(updatedUser);
-    localStorage.setItem('fitnessUser', JSON.stringify(updatedUser));
-    setIsEditing(false);
-  };
-
-  const handleInputChange = (field, value) => {
-    setFormData({
-      ...formData,
-      [field]: value
-    });
-  };
-
-  const handleGoalToggle = (goal) => {
-    const currentGoals = formData.goals || [];
-    if (currentGoals.includes(goal)) {
-      setFormData({
-        ...formData,
-        goals: currentGoals.filter(g => g !== goal)
-      });
-    } else {
-      setFormData({
-        ...formData,
-        goals: [...currentGoals, goal]
-      });
+  // Mock data - Posts
+  const [posts, setPosts] = useState([
+    {
+      id: 1,
+      author: 'Alex Morgan',
+      avatar: 'AM',
+      profileImage: '/images/profile-1.jpg',
+      timestamp: '2 hours ago',
+      difficulty: 'Advanced',
+      title: 'Completed 50 Pull-ups Challenge',
+      content: 'Just hit a new personal record today! Started with sets of 5, now doing 10 consecutive. The key is consistent training and proper form.',
+      image: '/images/pullups.jpg',
+      likes: 342,
+      comments: 28,
+      shares: 15,
+      difficulty_badge: 'bg-[#8B0000]',
+      tags: ['pullups', 'strength', 'PR'],
+      verified: true
+    },
+    {
+      id: 2,
+      author: 'Jordan Lee',
+      avatar: 'JL',
+      profileImage: '/images/profile-2.jpg',
+      timestamp: '4 hours ago',
+      difficulty: 'Intermediate',
+      title: 'Handstand Progress Update',
+      content: 'Week 3 of handstand training and I can now hold for 15 seconds against the wall. Never thought I could do this!',
+      image: '/images/handstand.jpg',
+      likes: 287,
+      comments: 42,
+      shares: 22,
+      difficulty_badge: 'bg-[#B8860B]',
+      tags: ['handstand', 'balance', 'flexibility'],
+      verified: false
+    },
+    {
+      id: 3,
+      author: 'Chris Rivera',
+      avatar: 'CR',
+      profileImage: '/images/profile-3.jpg',
+      timestamp: '6 hours ago',
+      difficulty: 'Beginner',
+      title: 'Day 1 of My Fitness Journey',
+      content: 'Starting my calisthenics journey today! Did 10 push-ups, 15 squats, and a 30-second plank. Ready to transform!',
+      image: '/images/workout.jpg',
+      likes: 156,
+      comments: 65,
+      shares: 34,
+      difficulty_badge: 'bg-[#228B22]',
+      tags: ['beginner', 'motivation', 'first-day'],
+      verified: false
     }
+  ]);
+
+  // Mock data - Leaderboard
+  const [leaderboard] = useState([
+    { rank: 1, name: 'Alex Morgan', level: 'Level 45', workouts: 287, streak: 89, points: 15420 },
+    { rank: 2, name: 'Sarah Chen', level: 'Level 42', workouts: 264, streak: 76, points: 14890 },
+    { rank: 3, name: 'Marcus Johnson', level: 'Level 41', workouts: 251, streak: 68, points: 14200 },
+    { rank: 4, name: 'Emma Davis', level: 'Level 39', workouts: 228, streak: 62, points: 13540 },
+    { rank: 5, name: 'Lucas Brown', level: 'Level 38', workouts: 215, streak: 58, points: 12890 }
+  ]);
+
+  // Mock data - Challenges
+  const [challenges] = useState([
+    {
+      id: 1,
+      title: '30-Day Push-up Challenge',
+      icon: 'PU',
+      participants: 2456,
+      progress: 65,
+      joined: true,
+      deadline: 'Ends in 8 days',
+      difficulty: 'Intermediate',
+      description: 'Complete daily push-ups. Target: 1000 total',
+      reward: '500 XP + Badge'
+    },
+    {
+      id: 2,
+      title: 'Plank Hold Master',
+      icon: 'PH',
+      participants: 1823,
+      progress: 42,
+      joined: false,
+      deadline: 'Ends in 15 days',
+      difficulty: 'Advanced',
+      description: 'Hold planks. Target: 5 minutes total',
+      reward: '750 XP + Trophy'
+    },
+    {
+      id: 3,
+      title: 'Week Warrior',
+      icon: 'WW',
+      participants: 5234,
+      progress: 78,
+      joined: true,
+      deadline: 'Ends in 2 days',
+      difficulty: 'Beginner',
+      description: 'Complete 5 workouts this week',
+      reward: '300 XP'
+    }
+  ]);
+
+  // Mock data - Groups
+  const [groups] = useState([
+    {
+      id: 1,
+      name: 'Calisthenics Beginners',
+      initials: 'CB',
+      image: '/images/group-1.jpg',
+      members: 3421,
+      joined: true,
+      description: 'Perfect for those just starting their journey'
+    },
+    {
+      id: 2,
+      name: 'Street Workout Pros',
+      initials: 'SWP',
+      image: '/images/group-2.jpg',
+      members: 2156,
+      joined: false,
+      description: 'Advanced techniques and skills'
+    }
+  ]);
+
+  const tabs = ['feed', 'leaderboard', 'challenges', 'groups', 'trending'];
+
+  // Fonctions
+  const toggleLike = (postId) => {
+    setLikes(prev => ({
+      ...prev,
+      [postId]: !prev[postId]
+    }));
   };
 
-  const progressHistory = [
-    { date: '2 weeks ago', weight: 78, bmi: 24.1 },
-    { date: '1 week ago', weight: 76.5, bmi: 23.6 },
-    { date: 'Today', weight: 75, bmi: 23.1 }
-  ];
+  const openPostDetail = (post) => {
+    setSelectedPost(post);
+    setShowPostModal(true);
+  };
 
-  const achievements = [
-    { icon: '🔥', name: '7-Day Warrior', unlocked: true, description: '7-day streak' },
-    { icon: '💯', name: 'Century', unlocked: true, description: '100 push-ups' },
-    { icon: '👑', name: 'Consistency', unlocked: false, description: '30-day streak' },
-    { icon: '🏆', name: 'Elite', unlocked: false, description: '1000 total workouts' },
-    { icon: '⭐', name: 'Star', unlocked: true, description: '100 followers' },
-    { icon: '🚀', name: 'Rocketeer', unlocked: false, description: '10 programs done' }
-  ];
+  const closePostDetail = () => {
+    setShowPostModal(false);
+    setSelectedPost(null);
+    setCurrentComment('');
+  };
 
-  const goalOptions = ['Strength', 'Muscle', 'Fat Loss', 'Endurance', 'Flexibility', 'Stamina'];
+  const addComment = () => {
+    if (!currentComment.trim() || !selectedPost) return;
+    
+    setComments(prev => ({
+      ...prev,
+      [selectedPost.id]: [...(prev[selectedPost.id] || []), {
+        id: Date.now(),
+        text: currentComment,
+        author: 'You',
+        timestamp: 'now'
+      }]
+    }));
+    
+    setCurrentComment('');
+  };
 
-  const experienceOptions = ['Beginner', 'Intermediate', 'Advanced', 'Elite'];
-
-  const genderOptions = ['Male', 'Female', 'Other'];
-
-  const settings = [
-    { icon: Bell, label: 'Notifications', value: true, id: 'notifications' },
-    { icon: Shield, label: 'Privacy', value: false, id: 'privacy' },
-    { icon: Mail, label: 'Email Updates', value: true, id: 'email' },
-    { icon: HelpCircle, label: 'Help & Support', value: null, id: 'help' }
-  ];
-
-  const personalStats = [
-    { label: 'Member Since', value: '6 months', icon: '📅' },
-    { label: 'Total Workouts', value: '24', icon: '💪' },
-    { label: 'Followers', value: '145', icon: '👥' },
-    { label: 'Following', value: '89', icon: '⭐' }
-  ];
-
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-dark via-dark-secondary to-dark font-poppins text-white pb-28">
-      {/* Header */}
-      <div className="sticky top-0 z-20 bg-dark-secondary border-b border-metallic border-opacity-20 backdrop-blur-sm">
-        <div className="max-w-md mx-auto px-6 py-4 flex items-center justify-between">
-          <h1 className="text-2xl font-bold">Profile</h1>
-          <button
-            onClick={() => {
-              if (isEditing) {
-                setFormData({
-                  name: user?.name || 'Athlete',
-                  weight: user?.weight || 75,
-                  height: user?.height || 180,
-                  age: user?.age || 25,
-                  experience: user?.experience || 'Intermediate',
-                  gender: user?.gender || 'Male'
-                });
-              }
-              setIsEditing(!isEditing);
-            }}
-            className="p-2 hover:bg-dark rounded-lg transition"
-          >
-            {isEditing ? <X size={20} /> : <Edit2 size={20} />}
-          </button>
-        </div>
-      </div>
-
-      <div className="max-w-md mx-auto px-6">
-        {/* Profile Header Card */}
-        <div className="mt-6 bg-gradient-to-br from-dark-secondary to-dark border border-metallic border-opacity-30 rounded-2xl p-6 text-center">
-          <div className="relative w-24 h-24 mx-auto mb-4">
-            <div className="w-full h-full rounded-full bg-gradient-to-br from-accent to-green-400 flex items-center justify-center text-5xl border-4 border-dark">
-              {formData.name.charAt(0).toUpperCase()}
-            </div>
-            {isEditing && (
-              <button className="absolute bottom-0 right-0 bg-accent text-dark p-2 rounded-full hover:bg-green-400 transition shadow-lg">
-                <Camera size={16} />
-              </button>
+  // Components
+  const PostCard = ({ post }) => (
+    <div 
+      onClick={() => openPostDetail(post)}
+      className={`${bgSecondary} border ${border} rounded-xl p-4 hover:border-[#47A025] transition cursor-pointer`}
+    >
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-3 flex-1">
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#47A025] to-[#2d6015] flex items-center justify-center text-sm font-bold text-white overflow-hidden">
+            {post.profileImage ? (
+              <img src={post.profileImage} alt={post.author} className="w-full h-full object-cover" />
+            ) : (
+              post.avatar
             )}
           </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <p className="font-bold text-sm">{post.author}</p>
+              {post.verified && <Star size={12} className={primaryGreen} fill={`#47A025`} />}
+            </div>
+            <p className={`${textSecondary} text-xs`}>{post.timestamp}</p>
+          </div>
+        </div>
+        <span className={`text-xs px-2 py-1 rounded-full font-bold text-white ${post.difficulty_badge}`}>
+          {post.difficulty}
+        </span>
+      </div>
 
-          {isEditing ? (
+      <h3 className="font-bold text-white mb-2">{post.title}</h3>
+      <p className={`${textSecondary} text-sm mb-3`}>{post.content.substring(0, 100)}...</p>
+
+      <div className="w-full h-32 mb-4 bg-[#242220] rounded-lg border border-[#BFB7B6] flex items-center justify-center overflow-hidden">
+        {post.image ? (
+          <img src={post.image} alt={post.title} className="w-full h-full object-cover" />
+        ) : (
+          <p className="text-[#BFB7B6] text-sm">Photo</p>
+        )}
+      </div>
+
+      <div className="flex flex-wrap gap-2 mb-3">
+        {post.tags.map((tag, idx) => (
+          <span key={idx} className="text-xs bg-[#47A025] bg-opacity-20 text-[#47A025] px-2 py-1 rounded-full">
+            #{tag}
+          </span>
+        ))}
+      </div>
+
+      <div className="flex gap-4 mb-3 text-sm border-t border-b border-[#BFB7B6] py-3">
+        <span className="flex items-center gap-1 text-[#BFB7B6]">
+          <Heart size={14} /> {post.likes}
+        </span>
+        <span className="flex items-center gap-1 text-[#BFB7B6]">
+          <MessageCircle size={14} /> {post.comments}
+        </span>
+        <span className="flex items-center gap-1 text-[#BFB7B6]">
+          <Share2 size={14} /> {post.shares}
+        </span>
+      </div>
+
+      <div className="grid grid-cols-3 gap-2">
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            toggleLike(post.id);
+          }}
+          className={`py-2 rounded-lg font-bold transition text-sm ${
+            likes[post.id]
+              ? `bg-[#8B0000] text-white`
+              : `${bgTertiary} border ${border} text-[#BFB7B6] hover:border-[#47A025]`
+          }`}
+        >
+          Like
+        </button>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            openPostDetail(post);
+            setShowCommentModal(true);
+          }}
+          className={`py-2 rounded-lg font-bold transition text-sm ${bgTertiary} border ${border} text-[#BFB7B6] hover:border-[#47A025]`}
+        >
+          Comment
+        </button>
+        <button className={`py-2 rounded-lg font-bold transition text-sm ${bgTertiary} border ${border} text-[#BFB7B6] hover:border-[#47A025]`}>
+          Share
+        </button>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className={`w-full min-h-screen ${bg} ${text} pb-32`}>
+      {/* Header */}
+      <div className={`${bgSecondary} border-b ${border} sticky top-0 z-20`}>
+        <div className="w-full px-6 py-4">
+          <div className="flex items-center justify-between mb-4">
+            <h1 className="text-3xl font-bold font-playfair">Community</h1>
+          </div>
+
+          {/* Search */}
+          <div className="relative mb-4">
+            <Search size={16} className={`absolute left-3 top-3 ${textSecondary}`} />
             <input
               type="text"
-              value={formData.name}
-              onChange={(e) => handleInputChange('name', e.target.value)}
-              className="bg-dark-secondary border border-accent rounded px-3 py-2 text-white w-full text-center text-2xl font-bold mb-1"
+              placeholder="Search posts, people..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className={`w-full pl-10 pr-4 py-2 ${bgTertiary} border ${border} rounded-lg text-sm focus:border-[#47A025] outline-none transition ${text}`}
             />
-          ) : (
-            <h2 className="text-2xl font-bold mb-1">{formData.name}</h2>
-          )}
-
-          <p className="text-metallic text-sm mb-3">{formData.experience} • {(formData.goals || []).slice(0, 2).join(', ')}</p>
-
-          {!isEditing && (
-            <div className="flex items-center justify-center gap-6 text-xs">
-              <div>
-                <p className="text-metallic">Age</p>
-                <p className="font-bold">{formData.age}</p>
-              </div>
-              <div className="h-8 w-px bg-metallic bg-opacity-20"></div>
-              <div>
-                <p className="text-metallic">Gender</p>
-                <p className="font-bold">{formData.gender}</p>
-              </div>
-              <div className="h-8 w-px bg-metallic bg-opacity-20"></div>
-              <div>
-                <p className="text-metallic">Experience</p>
-                <p className="font-bold">{formData.experience}</p>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Personal Stats */}
-        <div className="grid grid-cols-4 gap-2 mt-6 mb-6">
-          {personalStats.map((stat, idx) => (
-            <div key={idx} className="bg-dark-secondary border border-metallic border-opacity-30 rounded-lg p-2 text-center">
-              <p className="text-lg mb-1">{stat.icon}</p>
-              <p className="text-accent text-sm font-bold">{stat.value}</p>
-              <p className="text-metallic text-xs line-clamp-1">{stat.label}</p>
-            </div>
-          ))}
-        </div>
-
-        {/* Body Measurements */}
-        <div className="mb-6">
-          <h3 className="font-bold mb-3 flex items-center gap-2">
-            <Target size={18} className="text-accent" />
-            Body Measurements
-          </h3>
-          <div className="grid grid-cols-3 gap-3">
-            <div className="bg-dark-secondary border border-metallic border-opacity-30 rounded-lg p-4 text-center">
-              <p className="text-metallic text-xs mb-2 font-bold">WEIGHT</p>
-              {isEditing ? (
-                <input
-                  type="number"
-                  value={formData.weight}
-                  onChange={(e) => handleInputChange('weight', parseFloat(e.target.value))}
-                  className="bg-dark border border-accent rounded px-2 py-1 w-full text-white text-center font-bold text-lg"
-                />
-              ) : (
-                <p className="text-2xl font-bold text-accent">{formData.weight}</p>
-              )}
-              <p className="text-metallic text-xs mt-1">kg</p>
-            </div>
-
-            <div className="bg-dark-secondary border border-metallic border-opacity-30 rounded-lg p-4 text-center">
-              <p className="text-metallic text-xs mb-2 font-bold">HEIGHT</p>
-              {isEditing ? (
-                <input
-                  type="number"
-                  value={formData.height}
-                  onChange={(e) => handleInputChange('height', parseFloat(e.target.value))}
-                  className="bg-dark border border-accent rounded px-2 py-1 w-full text-white text-center font-bold text-lg"
-                />
-              ) : (
-                <p className="text-2xl font-bold">{formData.height}</p>
-              )}
-              <p className="text-metallic text-xs mt-1">cm</p>
-            </div>
-
-            <div className="bg-dark-secondary border border-metallic border-opacity-30 rounded-lg p-4 text-center">
-              <p className="text-metallic text-xs mb-2 font-bold">BMI</p>
-              <p className={`text-2xl font-bold ${bmiInfo.color}`}>{bmi}</p>
-              <p className={`text-metallic text-xs mt-1 ${bmiInfo.color}`}>{bmiInfo.category}</p>
-            </div>
           </div>
-        </div>
 
-        {/* Age & Experience (Edit Mode) */}
-        {isEditing && (
-          <div className="mb-6">
-            <h3 className="font-bold mb-3">Additional Info</h3>
-            <div className="space-y-3">
-              <div>
-                <label className="text-metallic text-xs font-bold block mb-1">AGE</label>
-                <input
-                  type="number"
-                  value={formData.age}
-                  onChange={(e) => handleInputChange('age', parseInt(e.target.value))}
-                  className="bg-dark border border-metallic border-opacity-30 rounded px-3 py-2 w-full text-white focus:border-accent focus:border-opacity-50 outline-none"
-                />
-              </div>
-              <div>
-                <label className="text-metallic text-xs font-bold block mb-1">GENDER</label>
-                <select
-                  value={formData.gender}
-                  onChange={(e) => handleInputChange('gender', e.target.value)}
-                  className="bg-dark border border-metallic border-opacity-30 rounded px-3 py-2 w-full text-white focus:border-accent focus:border-opacity-50 outline-none"
-                >
-                  {genderOptions.map(opt => (
-                    <option key={opt} value={opt}>{opt}</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="text-metallic text-xs font-bold block mb-1">EXPERIENCE LEVEL</label>
-                <select
-                  value={formData.experience}
-                  onChange={(e) => handleInputChange('experience', e.target.value)}
-                  className="bg-dark border border-metallic border-opacity-30 rounded px-3 py-2 w-full text-white focus:border-accent focus:border-opacity-50 outline-none"
-                >
-                  {experienceOptions.map(opt => (
-                    <option key={opt} value={opt}>{opt}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Contact Info (View Mode) */}
-        {!isEditing && (
-          <div className="mb-6">
-            <h3 className="font-bold mb-3">Contact Information</h3>
-            <div className="space-y-2">
-              <div className="bg-dark-secondary border border-metallic border-opacity-30 rounded-lg p-3 flex items-center gap-3">
-                <Mail size={18} className="text-accent flex-shrink-0" />
-                <div className="flex-1 truncate">
-                  <p className="text-metallic text-xs">Email</p>
-                  <p className="font-bold text-sm truncate">{formData.email}</p>
-                </div>
-              </div>
-              <div className="bg-dark-secondary border border-metallic border-opacity-30 rounded-lg p-3 flex items-center gap-3">
-                <Phone size={18} className="text-accent flex-shrink-0" />
-                <div className="flex-1 truncate">
-                  <p className="text-metallic text-xs">Phone</p>
-                  <p className="font-bold text-sm">{formData.phone}</p>
-                </div>
-              </div>
-              <div className="bg-dark-secondary border border-metallic border-opacity-30 rounded-lg p-3 flex items-center gap-3">
-                <MapPin size={18} className="text-accent flex-shrink-0" />
-                <div className="flex-1 truncate">
-                  <p className="text-metallic text-xs">Location</p>
-                  <p className="font-bold text-sm">{formData.location}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Progress History */}
-        <div className="mb-6">
-          <h3 className="font-bold mb-3 flex items-center gap-2">
-            <TrendingUp size={18} className="text-accent" />
-            Progress History
-          </h3>
-          <div className="space-y-2">
-            {progressHistory.map((item, idx) => (
-              <div key={idx} className="bg-dark-secondary border border-metallic border-opacity-30 rounded-lg p-3 flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-bold">{item.date}</p>
-                  <p className="text-metallic text-xs">Weight: {item.weight} kg • BMI: {item.bmi}</p>
-                </div>
-                {idx === progressHistory.length - 1 && (
-                  <span className="text-accent font-bold text-xs px-2 py-1 bg-accent bg-opacity-20 rounded">Current</span>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Goals */}
-        <div className="mb-6">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="font-bold">Your Goals</h3>
-            {!isEditing && <span className="text-accent text-xs font-bold">{(formData.goals || []).length} goals</span>}
-          </div>
-          {isEditing ? (
-            <div className="grid grid-cols-2 gap-2">
-              {goalOptions.map(goal => (
-                <button
-                  key={goal}
-                  onClick={() => handleGoalToggle(goal)}
-                  className={`px-3 py-2 rounded-lg font-bold text-sm transition border ${
-                    (formData.goals || []).includes(goal)
-                      ? 'bg-accent text-dark border-accent'
-                      : 'bg-dark-secondary border-metallic border-opacity-30 hover:border-metallic hover:border-opacity-50'
-                  }`}
-                >
-                  {goal}
-                </button>
-              ))}
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 gap-2">
-              {(formData.goals || []).map(goal => (
-                <div key={goal} className="bg-accent bg-opacity-20 border border-accent border-opacity-50 rounded-lg p-3 text-center">
-                  <p className="font-bold text-sm">{goal}</p>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Achievements */}
-        <div className="mb-6">
-          <h3 className="font-bold mb-3">Badges & Achievements</h3>
-          <div className="grid grid-cols-3 gap-2">
-            {achievements.map((badge, idx) => (
-              <div
-                key={idx}
-                className={`flex flex-col items-center gap-1 p-3 rounded-lg border transition ${
-                  badge.unlocked
-                    ? 'bg-dark-secondary border-accent border-opacity-50 cursor-pointer hover:border-opacity-100'
-                    : 'bg-dark border-metallic border-opacity-30 opacity-50'
+          {/* Tabs */}
+          <div className="flex gap-2 overflow-x-auto pb-2">
+            {tabs.map(tab => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`px-3 py-1 rounded-lg font-bold text-xs whitespace-nowrap transition ${
+                  activeTab === tab
+                    ? `${primaryGreenBg} text-[#100E0E]`
+                    : `${bgTertiary} border ${border} text-[#BFB7B6] hover:border-[#47A025]`
                 }`}
               >
-                <span className="text-3xl">{badge.icon}</span>
-                <p className="text-xs text-center font-bold line-clamp-1">{badge.name}</p>
-                <p className="text-metallic text-xs text-center line-clamp-1">{badge.description}</p>
-              </div>
+                {tab.charAt(0).toUpperCase() + tab.slice(1)}
+              </button>
             ))}
           </div>
         </div>
+      </div>
 
-        {/* Settings */}
-        <div className="mb-6">
-          <h3 className="font-bold mb-3 flex items-center gap-2">
-            <Settings size={18} className="text-accent" />
-            Settings
-          </h3>
-          <div className="space-y-2">
-            {settings.map((setting, idx) => {
-              const Icon = setting.icon;
-              return (
-                <div
-                  key={idx}
-                  className="bg-dark-secondary border border-metallic border-opacity-30 rounded-lg p-4 flex items-center justify-between hover:border-metallic hover:border-opacity-50 transition cursor-pointer"
-                >
-                  <div className="flex items-center gap-3">
-                    <Icon size={18} className="text-accent" />
-                    <span className="font-bold text-sm">{setting.label}</span>
-                  </div>
-                  {setting.value !== null && (
-                    <div className={`w-8 h-5 rounded-full transition ${setting.value ? 'bg-accent' : 'bg-metallic'}`}></div>
-                  )}
-                  {setting.value === null && (
-                    <ChevronRight size={18} className="text-metallic-light" />
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Edit/Save Buttons */}
-        {isEditing && (
-          <div className="space-y-2 mb-6">
-            <button
-              onClick={handleSave}
-              className="w-full bg-accent hover:bg-green-400 text-dark font-bold py-4 rounded-lg transition flex items-center justify-center gap-2"
-            >
-              <Save size={18} />
-              Save Changes
-            </button>
-            <button
-              onClick={() => setIsEditing(false)}
-              className="w-full bg-dark-secondary border border-metallic border-opacity-30 hover:border-metallic hover:border-opacity-50 font-bold py-4 rounded-lg transition"
-            >
-              Cancel
-            </button>
-          </div>
-        )}
-
-        {/* Share Profile */}
-        {!isEditing && (
-          <div className="mb-6">
-            <button className="w-full bg-dark-secondary hover:bg-dark border border-metallic border-opacity-30 hover:border-metallic hover:border-opacity-50 font-bold py-3 rounded-lg transition flex items-center justify-center gap-2">
-              <Share2 size={18} />
-              Share Profile
-            </button>
-          </div>
-        )}
-
-        {/* Danger Zone */}
-        <div className="mb-6">
-          <h3 className="font-bold text-red-400 mb-3 flex items-center gap-2">
-            ⚠️ Danger Zone
-          </h3>
-          <div className="space-y-2">
-            <button className="w-full bg-red-500 bg-opacity-20 border border-red-500 border-opacity-50 hover:bg-opacity-30 font-bold py-3 rounded-lg transition flex items-center justify-center gap-2">
-              <LogOut size={18} />
-              Logout
-            </button>
-            <button
-              onClick={() => setShowDeleteConfirm(true)}
-              className="w-full bg-red-500 bg-opacity-10 border border-red-500 border-opacity-30 hover:bg-opacity-20 font-bold py-3 rounded-lg transition flex items-center justify-center gap-2 text-red-400"
-            >
-              <Trash2 size={18} />
-              Delete Account
-            </button>
-          </div>
-        </div>
-
-        {/* Delete Confirmation Modal */}
-        {showDeleteConfirm && (
-          <div className="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4">
-            <div className="bg-dark-secondary rounded-lg p-6 max-w-sm w-full border border-metallic border-opacity-30">
-              <p className="text-2xl mb-2">⚠️</p>
-              <h3 className="text-xl font-bold mb-2">Delete Account?</h3>
-              <p className="text-metallic text-sm mb-6">This action cannot be undone. All your data will be permanently deleted.</p>
-              <div className="space-y-2">
+      {/* Content */}
+      <div className="w-full px-6 py-4">
+        {/* FEED TAB */}
+        {activeTab === 'feed' && (
+          <div className="space-y-4">
+            <div className="flex gap-2 overflow-x-auto pb-2">
+              {['All', 'Beginner', 'Intermediate', 'Advanced'].map(diff => (
                 <button
-                  onClick={() => setShowDeleteConfirm(false)}
-                  className="w-full bg-dark hover:bg-dark-secondary border border-metallic border-opacity-30 font-bold py-3 rounded-lg transition"
+                  key={diff}
+                  onClick={() => setFilterDifficulty(diff)}
+                  className={`px-3 py-1 rounded-lg font-bold text-xs whitespace-nowrap transition ${
+                    filterDifficulty === diff
+                      ? `${primaryGreenBg} text-[#100E0E]`
+                      : `${bgTertiary} border ${border} text-[#BFB7B6] hover:border-[#47A025]`
+                  }`}
                 >
-                  Cancel
+                  {diff}
                 </button>
-                <button className="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-3 rounded-lg transition">
-                  Delete Account
-                </button>
+              ))}
+            </div>
+
+            <div className="space-y-4">
+              {posts
+                .filter(post => filterDifficulty === 'All' || post.difficulty === filterDifficulty)
+                .filter(post =>
+                  post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                  post.author.toLowerCase().includes(searchQuery.toLowerCase())
+                )
+                .map(post => (
+                  <PostCard key={post.id} post={post} />
+                ))}
+            </div>
+          </div>
+        )}
+
+        {/* LEADERBOARD TAB */}
+        {activeTab === 'leaderboard' && (
+          <div className="space-y-3">
+            <div className={`${bgSecondary} border ${border} rounded-xl p-4 mb-6`}>
+              <h2 className="text-lg font-bold mb-2 flex items-center gap-2">
+                <Trophy size={20} className={primaryGreen} />
+                Global Leaderboard
+              </h2>
+              <p className={`text-sm ${textSecondary}`}>Top performers this month</p>
+            </div>
+
+            {leaderboard.map((user, idx) => (
+              <div key={idx} className={`${bgSecondary} border ${border} rounded-xl p-4 hover:border-[#47A025] transition`}>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3 flex-1">
+                    <div className={`text-lg font-bold w-8 h-8 flex items-center justify-center rounded-lg font-playfair ${
+                      idx === 0 ? 'bg-[#FFD700] text-black' :
+                      idx === 1 ? 'bg-[#C0C0C0] text-black' :
+                      idx === 2 ? 'bg-[#CD7F32] text-white' :
+                      `${bgTertiary} border ${border}`
+                    }`}>
+                      {idx + 1}
+                    </div>
+                    <div>
+                      <p className="font-bold">{user.name}</p>
+                      <p className={`text-xs ${textSecondary}`}>{user.level}</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className={`font-bold flex items-center gap-1 ${primaryGreen}`}>
+                      <Zap size={14} /> {user.points}
+                    </p>
+                    <p className={`text-xs ${textSecondary}`}>{user.workouts} workouts</p>
+                  </div>
+                </div>
+                <div className="mt-3 pt-3 border-t border-[#BFB7B6] flex justify-between items-center">
+                  <span className={`text-xs ${textSecondary}`}>Streak</span>
+                  <span className="text-sm font-bold text-[#DC143C] flex items-center gap-1">
+                    <Flame size={14} /> {user.streak} days
+                  </span>
+                </div>
+              </div>
+            ))}
+
+            <div className={`${bgSecondary} border ${border} rounded-xl p-4 mt-6`}>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className={`text-xs ${textSecondary} mb-1`}>Your Rank</p>
+                  <p className="text-2xl font-bold font-playfair">#127</p>
+                </div>
+                <div className="text-right">
+                  <p className={`text-xs ${textSecondary} mb-1`}>Points to next</p>
+                  <p className={`text-lg font-bold ${primaryGreen}`}>450 XP</p>
+                </div>
               </div>
             </div>
+          </div>
+        )}
+
+        {/* CHALLENGES TAB */}
+        {activeTab === 'challenges' && (
+          <div className="space-y-3">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-bold flex items-center gap-2">
+                <Target size={20} className={primaryGreen} />
+                Active Challenges
+              </h2>
+              <button className={`text-xs ${primaryGreenBg} text-[#100E0E] px-3 py-1 rounded-lg font-bold hover:bg-[#2d6015] transition`}>
+                Explore All
+              </button>
+            </div>
+
+            {challenges.map(challenge => (
+              <div key={challenge.id} className={`${bgSecondary} border ${border} rounded-xl p-4 hover:border-[#47A025] transition`}>
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex items-center gap-3 flex-1">
+                    <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-[#47A025] to-[#2d6015] flex items-center justify-center text-white font-bold text-sm">
+                      {challenge.icon}
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-bold">{challenge.title}</h3>
+                      <p className={`text-xs ${textSecondary}`}>{challenge.participants} Participants</p>
+                    </div>
+                  </div>
+                  <span className={`text-xs px-2 py-1 rounded-full font-bold whitespace-nowrap ${
+                    challenge.difficulty === 'Beginner' ? 'bg-[#228B22] text-white' :
+                    challenge.difficulty === 'Intermediate' ? 'bg-[#B8860B] text-white' :
+                    'bg-[#8B0000] text-white'
+                  }`}>
+                    {challenge.difficulty}
+                  </span>
+                </div>
+
+                <p className={`text-xs ${textSecondary} mb-3`}>{challenge.description}</p>
+
+                <div className="mb-3">
+                  <div className="flex justify-between text-xs mb-1">
+                    <span className={textSecondary}>Progress</span>
+                    <span className="font-bold">{challenge.progress}%</span>
+                  </div>
+                  <div className={`w-full h-2 rounded-full overflow-hidden border ${border}`}>
+                    <div
+                      className={`h-full ${primaryGreenBg} rounded-full transition-all`}
+                      style={{ width: `${challenge.progress}%` }}
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between pt-3 border-t border-[#BFB7B6]">
+                  <div>
+                    <p className={`text-xs ${textSecondary}`}>{challenge.deadline}</p>
+                    <p className={`text-xs ${primaryGreen} font-bold`}>{challenge.reward}</p>
+                  </div>
+                  <button className={`px-4 py-2 rounded-lg text-sm font-bold transition ${
+                    challenge.joined
+                      ? `${primaryGreenBg} text-[#100E0E] hover:bg-[#2d6015]`
+                      : `${bgTertiary} border ${border} text-[#47A025] hover:border-[#47A025]`
+                  }`}>
+                    {challenge.joined ? 'In Progress' : 'Join'}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* GROUPS TAB */}
+        {activeTab === 'groups' && (
+          <div className="space-y-3">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-bold flex items-center gap-2">
+                <Users size={20} className={primaryGreen} />
+                Community Groups
+              </h2>
+              <button className={`text-xs ${primaryGreenBg} text-[#100E0E] px-3 py-1 rounded-lg font-bold hover:bg-[#2d6015] transition`}>
+                Create
+              </button>
+            </div>
+
+            {groups.map(group => (
+              <div key={group.id} className={`${bgSecondary} border ${border} rounded-xl p-4 hover:border-[#47A025] transition`}>
+                <div className="flex items-start gap-3 mb-3">
+                  <div className="w-16 h-16 rounded-lg bg-gradient-to-br from-[#47A025] to-[#2d6015] flex items-center justify-center text-white font-bold text-lg overflow-hidden flex-shrink-0">
+                    {group.image ? (
+                      <img src={group.image} alt={group.name} className="w-full h-full object-cover" />
+                    ) : (
+                      group.initials
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-bold">{group.name}</h3>
+                    <p className={`text-xs ${textSecondary}`}>{group.members.toLocaleString()} Members</p>
+                    <p className={`text-sm ${textSecondary} mt-2`}>{group.description}</p>
+                  </div>
+                </div>
+
+                <button className={`w-full py-2 rounded-lg text-sm font-bold transition ${
+                  group.joined
+                    ? `bg-[#47A025] bg-opacity-20 border border-[#47A025] text-[#47A025] hover:bg-opacity-30`
+                    : `${primaryGreenBg} text-[#100E0E] hover:bg-[#2d6015]`
+                }`}>
+                  {group.joined ? 'View Group' : 'Join Group'}
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* TRENDING TAB */}
+        {activeTab === 'trending' && (
+          <div className="space-y-3">
+            <div className={`${bgSecondary} border ${border} rounded-xl p-4 mb-4`}>
+              <h2 className="text-lg font-bold mb-1 flex items-center gap-2">
+                <TrendingUp size={20} className={primaryGreen} />
+                Trending Now
+              </h2>
+              <p className={`text-xs ${textSecondary}`}>Most popular this week</p>
+            </div>
+
+            <div className="space-y-2 mb-6">
+              {['#pushupchallenge', '#handstand', '#strengthtraining', '#calisthenics', '#fitnessmotivation'].map((tag, idx) => (
+                <div key={idx} className={`${bgSecondary} border ${border} rounded-lg p-3 hover:bg-[#242220] cursor-pointer transition`}>
+                  <p className={`font-bold text-sm ${primaryGreen}`}>{tag}</p>
+                  <p className={`text-xs ${textSecondary} mt-1`}>{Math.floor(Math.random() * 5000) + 1000} posts</p>
+                </div>
+              ))}
+            </div>
+
+            <h3 className="text-lg font-bold mt-6 mb-3 flex items-center gap-2">
+              <Award size={18} className="text-[#FFD700]" />
+              Top Posts
+            </h3>
+            
+            {posts.slice(0, 2).map(post => (
+              <PostCard key={post.id} post={post} />
+            ))}
           </div>
         )}
       </div>
+
+      {/* POST DETAIL MODAL */}
+      {showPostModal && selectedPost && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+          <div className={`${bgSecondary} border ${border} rounded-xl max-w-md w-full max-h-96 overflow-y-auto`}>
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 border-b border-[#BFB7B6]">
+              <h2 className="text-lg font-bold">{selectedPost.title}</h2>
+              <button onClick={closePostDetail} className={`${textSecondary} hover:text-white transition`}>
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="p-4">
+              <div className="mb-4">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#47A025] to-[#2d6015] flex items-center justify-center font-bold text-sm">
+                    {selectedPost.avatar}
+                  </div>
+                  <div>
+                    <p className="font-bold">{selectedPost.author}</p>
+                    <p className={`text-xs ${textSecondary}`}>{selectedPost.timestamp}</p>
+                  </div>
+                </div>
+              </div>
+
+              <p className={`${textSecondary} mb-4 leading-relaxed`}>{selectedPost.content}</p>
+
+              {/* Comments Section */}
+              <div className={`border-t border-[#BFB7B6] pt-4`}>
+                <h4 className="font-bold mb-3">Comments ({comments[selectedPost.id]?.length || 0})</h4>
+                
+                <div className="space-y-2 mb-4 max-h-32 overflow-y-auto">
+                  {comments[selectedPost.id]?.map(comment => (
+                    <div key={comment.id} className={`${bgTertiary} border ${border} rounded p-2`}>
+                      <p className="font-bold text-sm">{comment.author}</p>
+                      <p className="text-sm text-[#BFB7B6]">{comment.text}</p>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Add Comment */}
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="Add comment..."
+                    value={currentComment}
+                    onChange={(e) => setCurrentComment(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && addComment()}
+                    className={`flex-1 px-3 py-2 ${bgTertiary} border ${border} rounded text-sm focus:border-[#47A025] outline-none ${text}`}
+                  />
+                  <button
+                    onClick={addComment}
+                    className={`${primaryGreenBg} text-[#100E0E] px-4 py-2 rounded font-bold hover:bg-[#2d6015] transition`}
+                  >
+                    Post
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
