@@ -1,299 +1,251 @@
-// src/components/MyProgress.jsx
+import React, { useState, useEffect } from 'react';
+import { TrendingUp, Download, Calendar, Activity, Target, Zap, Award, Filter, LineChart, BarChart3, Flame, Trophy, Calendar as CalendarIcon } from 'lucide-react';
 
-import React, { useState } from 'react';
-import { TrendingUp, Download, Calendar, Activity, Target, Zap, Award, Filter } from 'lucide-react';
+export default function MyProgress() {
+  useEffect(() => {
+    const style = document.createElement('style');
+    style.textContent = `
+      @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&display=swap');
+      .font-playfair { font-family: 'Playfair Display', serif; }
+    `;
+    document.head.appendChild(style);
+    return () => document.head.removeChild(style);
+  }, []);
 
-export default function MyProgress({ user }) {
+  const bg = 'bg-[#100E0E]';
+  const bgSecondary = 'bg-[#1a1817]';
+  const bgTertiary = 'bg-[#242220]';
+  const text = 'text-white';
+  const textSecondary = 'text-[#BFB7B6]';
+  const border = 'border-[#BFB7B6]';
+  const primaryGreen = 'text-[#47A025]';
+  const primaryGreenBg = 'bg-[#47A025]';
+
   const [timeRange, setTimeRange] = useState('week');
+  const [selectedMetric, setSelectedMetric] = useState('workouts');
 
+  // Top Stats Cards
   const stats = [
-    { label: 'Total Workouts', value: '24', change: '+3', icon: Activity, color: 'text-accent' },
-    { label: 'Total Hours', value: '18.5h', change: '+2h', icon: Zap, color: 'text-cyan-400' },
-    { label: 'Calories Burned', value: '6,240', change: '+450', icon: '🔥', color: 'text-red-400' },
-    { label: 'Current Streak', value: '7 days', change: '+2', icon: Target, color: 'text-yellow-400' }
+    { label: 'Total Workouts', value: '24', change: '+3', icon: Activity, subtext: 'this week' },
+    { label: 'Total Hours', value: '18.5h', change: '+2h', icon: Zap, subtext: 'this week' },
+    { label: 'Calories Burned', value: '6,240', change: '+450', icon: Flame, subtext: 'this month' },
+    { label: 'Current Streak', value: '7 days', change: '+2', icon: Trophy, subtext: 'keep going!' }
   ];
 
+  // Weekly Chart Data
   const weekData = [
-    { day: 'Mon', workouts: 1, duration: 45, calories: 320 },
-    { day: 'Tue', workouts: 1, duration: 55, calories: 380 },
-    { day: 'Wed', workouts: 0, duration: 0, calories: 0 },
-    { day: 'Thu', workouts: 1, duration: 50, calories: 350 },
-    { day: 'Fri', workouts: 1, duration: 60, calories: 420 },
-    { day: 'Sat', workouts: 2, duration: 90, calories: 580 },
-    { day: 'Sun', workouts: 1, duration: 45, calories: 310 }
+    { day: 'Mon', workouts: 1, duration: 45, calories: 320, filled: true },
+    { day: 'Tue', workouts: 1, duration: 55, calories: 380, filled: true },
+    { day: 'Wed', workouts: 0, duration: 0, calories: 0, filled: false },
+    { day: 'Thu', workouts: 1, duration: 50, calories: 350, filled: true },
+    { day: 'Fri', workouts: 1, duration: 60, calories: 420, filled: true },
+    { day: 'Sat', workouts: 2, duration: 90, calories: 580, filled: true },
+    { day: 'Sun', workouts: 1, duration: 45, calories: 310, filled: true }
   ];
 
-  const maxValue = Math.max(...weekData.map(d => d.duration)) || 60;
+  const maxDuration = Math.max(...weekData.map(d => d.duration), 100);
 
-  const progressExercises = [
-    {
-      name: 'Push-ups',
-      current: 45,
-      personal: 50,
-      progress: 90,
-      unit: 'reps',
-      trend: '+15 this month'
-    },
-    {
-      name: 'Pull-ups',
-      current: 12,
-      personal: 15,
-      progress: 80,
-      unit: 'reps',
-      trend: '+5 this month'
-    },
-    {
-      name: 'Plank Hold',
-      current: 120,
-      personal: 180,
-      progress: 67,
-      unit: 'seconds',
-      trend: '+45s this month'
-    },
-    {
-      name: 'Handstand Hold',
-      current: 30,
-      personal: 60,
-      progress: 50,
-      unit: 'seconds',
-      trend: '+20s this month'
-    },
-    {
-      name: 'Dips',
-      current: 25,
-      personal: 30,
-      progress: 83,
-      unit: 'reps',
-      trend: '+8 this month'
-    },
-    {
-      name: 'Squats',
-      current: 60,
-      personal: 80,
-      progress: 75,
-      unit: 'reps',
-      trend: '+12 this month'
-    }
+  // Exercise Progress (Personal Records)
+  const exerciseProgress = [
+    { name: 'Push-ups', current: 45, pr: 50, progress: 90, unit: 'reps', trend: '+15 this month', lastUpdated: '2 days ago' },
+    { name: 'Pull-ups', current: 12, pr: 15, progress: 80, unit: 'reps', trend: '+5 this month', lastUpdated: '3 days ago' },
+    { name: 'Plank Hold', current: 120, pr: 180, progress: 67, unit: 'seconds', trend: '+45s this month', lastUpdated: '1 day ago' },
+    { name: 'Handstand Hold', current: 30, pr: 60, progress: 50, unit: 'seconds', trend: '+20s this month', lastUpdated: '1 week ago' },
+    { name: 'Dips', current: 25, pr: 30, progress: 83, unit: 'reps', trend: '+8 this month', lastUpdated: '4 days ago' },
+    { name: 'Squats', current: 60, pr: 80, progress: 75, unit: 'reps', trend: '+12 this month', lastUpdated: '2 days ago' }
   ];
 
+  // Achievements & Badges
   const achievements = [
-    { id: 1, name: '7-Day Warrior', icon: '🔥', unlocked: true, date: '2 weeks ago' },
-    { id: 2, name: 'Century', icon: '💯', unlocked: true, description: '100 push-ups', date: '1 week ago' },
-    { id: 3, name: 'Pull-up Master', icon: '🏋️', unlocked: false, description: '50 pull-ups' },
-    { id: 4, name: 'Planche Warrior', icon: '🤸', unlocked: false, description: 'Hold 60s' },
-    { id: 5, name: 'Handstand Pro', icon: '🤲', unlocked: true, description: 'Hold 60s', date: '3 days ago' },
-    { id: 6, name: 'Consistency King', icon: '👑', unlocked: false, description: '30-day streak' }
+    { id: 1, name: '7-Day Warrior', icon: '🔥', unlocked: true, date: '2 weeks ago', desc: 'Complete 7 workouts' },
+    { id: 2, name: 'Century', icon: '💯', unlocked: true, desc: '100 push-ups', date: '1 week ago' },
+    { id: 3, name: 'Pull-up Master', icon: '🏋️', unlocked: false, desc: '50 pull-ups' },
+    { id: 4, name: 'Planche Warrior', icon: '🤸', unlocked: false, desc: 'Hold 60s' },
+    { id: 5, name: 'Handstand Pro', icon: '🤲', unlocked: true, desc: 'Hold 60s', date: '3 days ago' },
+    { id: 6, name: 'Consistency King', icon: '👑', unlocked: false, desc: '30-day streak' }
   ];
 
+  // Monthly Overview
   const monthlyData = [
     { week: 'Week 1', workouts: 3, hours: 3.5, calories: 1200 },
     { week: 'Week 2', workouts: 4, hours: 4.2, calories: 1500 },
-    { week: 'Week 3', workouts: 5, hours: 5.1, calories: 1820 },
-    { week: 'Week 4', workouts: 5, hours: 4.8, calories: 1720 }
-  ];
-
-  const bodyMetrics = [
-    { label: 'Weight', value: '75 kg', change: '-2 kg', icon: '⚖️', color: 'text-green-400' },
-    { label: 'BMI', value: '23.1', change: '-0.5', icon: '📏', color: 'text-green-400' },
-    { label: 'Body Fat', value: '16%', change: '-2%', icon: '📊', color: 'text-yellow-400' },
-    { label: 'Muscle Mass', value: '58 kg', change: '+1.2 kg', icon: '💪', color: 'text-accent' }
+    { week: 'Week 3', workouts: 5, hours: 4.8, calories: 1650 },
+    { week: 'Week 4', workouts: 4, hours: 4.0, calories: 1400 }
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-dark via-dark-secondary to-dark font-poppins text-white pb-28">
+    <div className={`w-full h-screen ${bg} ${text} flex flex-col overflow-hidden`}>
+      
       {/* Header */}
-      <div className="sticky top-0 z-20 bg-dark-secondary border-b border-metallic border-opacity-20 backdrop-blur-sm">
-        <div className="max-w-md mx-auto px-6 py-4">
-          <h1 className="text-2xl font-bold">My Progress</h1>
-          <p className="text-metallic text-sm">Track your fitness journey</p>
+      <div className={`${bgSecondary} border-b ${border} flex-shrink-0`}>
+        <div className="w-full px-6 py-3">
+          <h1 className="text-3xl font-bold font-playfair">My Progress</h1>
+          <p className={`${textSecondary} text-xs font-playfair`}>Track your fitness journey</p>
         </div>
       </div>
 
-      <div className="max-w-md mx-auto px-6">
-        {/* Time Range Filter */}
-        <div className="flex gap-2 mt-6 mb-6 overflow-x-auto pb-2">
-          {['week', 'month', 'year'].map(range => (
-            <button
-              key={range}
-              onClick={() => setTimeRange(range)}
-              className={`px-4 py-2 rounded-full whitespace-nowrap font-bold text-sm transition ${
-                timeRange === range
-                  ? 'bg-accent text-dark'
-                  : 'bg-dark-secondary border border-metallic border-opacity-30 hover:border-metallic hover:border-opacity-50'
-              }`}
-            >
-              {range.charAt(0).toUpperCase() + range.slice(1)}
-            </button>
-          ))}
-        </div>
+      {/* Main Content */}
+      <div className="flex-1 overflow-y-auto">
+        <div className="w-full px-6 py-4 space-y-6 pb-8">
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-2 gap-3 mb-6">
-          {stats.map((stat, idx) => {
-            const Icon = typeof stat.icon === 'string' ? null : stat.icon;
-            return (
-              <div key={idx} className="bg-dark-secondary border border-metallic border-opacity-30 rounded-lg p-4">
-                <div className="flex items-center justify-between mb-2">
-                  {Icon ? (
-                    <Icon size={20} className={stat.color} />
-                  ) : (
-                    <span className="text-2xl">{stat.icon}</span>
-                  )}
-                  <span className="text-accent text-xs font-bold">{stat.change}</span>
-                </div>
-                <p className="text-metallic text-xs mb-1 font-bold">{stat.label}</p>
-                <p className="text-2xl font-bold">{stat.value}</p>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Body Metrics */}
-        <div className="mb-6">
-          <h3 className="font-bold mb-3 flex items-center gap-2">
-            <TrendingUp size={18} className="text-accent" />
-            Body Metrics
-          </h3>
-          <div className="grid grid-cols-2 gap-3">
-            {bodyMetrics.map((metric, idx) => (
-              <div key={idx} className="bg-dark-secondary border border-metallic border-opacity-30 rounded-lg p-3">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-2xl">{metric.icon}</span>
-                  <span className={`text-xs font-bold ${metric.color}`}>{metric.change}</span>
-                </div>
-                <p className="text-metallic text-xs mb-1">{metric.label}</p>
-                <p className="text-lg font-bold">{metric.value}</p>
-              </div>
+          {/* Time Range Filter */}
+          <div className="flex gap-2">
+            {['week', 'month', 'year'].map(range => (
+              <button
+                key={range}
+                onClick={() => setTimeRange(range)}
+                className={`px-4 py-2 rounded-lg font-bold font-playfair text-sm transition ${
+                  timeRange === range
+                    ? `${primaryGreenBg} text-[#100E0E]`
+                    : `${bgSecondary} border ${border} ${text} hover:border-[#47A025]`
+                }`}
+              >
+                {range.charAt(0).toUpperCase() + range.slice(1)}
+              </button>
             ))}
           </div>
-        </div>
 
-        {/* Weekly Activity Chart */}
-        <div className="bg-dark-secondary border border-metallic border-opacity-30 rounded-lg p-4 mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-bold">Weekly Activity</h3>
-            <Filter size={16} className="text-metallic" />
-          </div>
-          <div className="flex items-end justify-around gap-2 h-40">
-            {weekData.map((day, idx) => (
-              <div key={idx} className="flex flex-col items-center gap-1 flex-1">
-                <div className="relative w-full group">
-                  <div
-                    className="w-full bg-gradient-to-t from-accent to-green-300 rounded-t-lg transition-all duration-300 hover:from-green-300 hover:to-green-200 cursor-pointer"
-                    style={{ height: `${(day.duration / maxValue) * 120 || 4}px` }}
-                  />
-                  {day.workouts > 0 && (
-                    <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-dark px-2 py-1 rounded text-xs font-bold whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity z-10 border border-metallic border-opacity-30">
-                      {day.duration}m
+          {/* Key Stats - Grid */}
+          <div className="grid grid-cols-2 gap-4">
+            {stats.map((stat, idx) => {
+              const Icon = stat.icon;
+              return (
+                <div key={idx} className={`${bgSecondary} border ${border} rounded-xl p-4`}>
+                  <div className="flex items-start justify-between mb-2">
+                    <div>
+                      <p className={`text-xs font-playfair ${textSecondary}`}>{stat.label}</p>
+                      <p className="text-2xl font-bold font-playfair mt-1">{stat.value}</p>
                     </div>
-                  )}
-                </div>
-                <div className="text-center">
-                  <p className="text-metallic text-xs font-semibold">{day.day}</p>
-                  <p className="text-metallic text-xs">{day.workouts}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Monthly Overview */}
-        <div className="mb-6">
-          <h3 className="font-bold mb-3">Monthly Overview</h3>
-          <div className="space-y-2">
-            {monthlyData.map((week, idx) => (
-              <div key={idx} className="bg-dark-secondary border border-metallic border-opacity-30 rounded-lg p-3">
-                <div className="flex items-center justify-between mb-2">
-                  <p className="font-bold text-sm">{week.week}</p>
-                  <div className="flex gap-4 text-xs font-bold">
-                    <span className="text-accent">{week.workouts} WO</span>
-                    <span className="text-blue-400">{week.hours}h</span>
-                    <span className="text-red-400">{week.calories} cal</span>
+                    <Icon size={20} className={primaryGreen} />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <p className={`text-xs font-playfair ${textSecondary}`}>{stat.subtext}</p>
+                    <p className={`text-xs font-bold ${primaryGreen}`}>{stat.change}</p>
                   </div>
                 </div>
-                <div className="w-full h-2 bg-dark rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-gradient-to-r from-accent to-green-400 rounded-full"
-                    style={{ width: `${(week.workouts / 5) * 100}%` }}
-                  />
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
-        </div>
 
-        {/* Exercise PRs */}
-        <div className="mb-6">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="font-bold flex items-center gap-2">
-              <Award size={18} className="text-accent" />
-              Exercise Progress
-            </h3>
-            <button className="text-accent text-xs hover:text-green-300 font-bold">View All</button>
-          </div>
-          <div className="space-y-3">
-            {progressExercises.map((ex, idx) => (
-              <div key={idx} className="bg-dark-secondary border border-metallic border-opacity-30 rounded-lg p-4 hover:border-accent hover:border-opacity-50 transition cursor-pointer">
-                <div className="flex items-center justify-between mb-2">
-                  <h4 className="font-bold">{ex.name}</h4>
-                  <span className="text-accent text-sm font-bold">{ex.current} {ex.unit}</span>
+          {/* Weekly Activity Chart */}
+          <div className={`${bgSecondary} border ${border} rounded-xl p-4`}>
+            <h3 className="font-bold font-playfair mb-4">Weekly Activity</h3>
+            <div className="flex items-end justify-around h-32 gap-2">
+              {weekData.map((day, idx) => (
+                <div key={idx} className="flex flex-col items-center gap-2 flex-1">
+                  <div className={`w-full rounded-t-lg transition ${day.filled ? primaryGreenBg : bgTertiary}`} 
+                       style={{ height: day.duration ? `${(day.duration / maxDuration) * 100}%` : '10%', minHeight: '8px' }} />
+                  <p className={`text-xs font-playfair ${day.filled ? text : textSecondary}`}>{day.day}</p>
+                  <p className={`text-xs font-bold ${primaryGreen}`}>{day.duration}m</p>
                 </div>
-                <div className="mb-2">
-                  <div className="w-full h-2 bg-dark rounded-full overflow-hidden">
+              ))}
+            </div>
+          </div>
+
+          {/* Monthly Overview */}
+          <div className={`${bgSecondary} border ${border} rounded-xl p-4`}>
+            <h3 className="font-bold font-playfair mb-4">Monthly Overview</h3>
+            <div className="space-y-3">
+              {monthlyData.map((week, idx) => (
+                <div key={idx} className={`${bgTertiary} border ${border} rounded-lg p-3`}>
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="font-bold font-playfair text-sm">{week.week}</p>
+                    <div className="flex gap-3 text-xs font-bold">
+                      <span className={primaryGreen}>{week.workouts} WO</span>
+                      <span className="text-blue-400">{week.hours}h</span>
+                      <span className="text-red-400">{week.calories} cal</span>
+                    </div>
+                  </div>
+                  <div className={`w-full h-2 rounded-full overflow-hidden ${bgTertiary}`}>
                     <div
-                      className="h-full bg-gradient-to-r from-accent to-green-400 rounded-full transition-all"
-                      style={{ width: `${ex.progress}%` }}
+                      className={`h-full ${primaryGreenBg} rounded-full`}
+                      style={{ width: `${(week.workouts / 5) * 100}%` }}
                     />
                   </div>
                 </div>
-                <div className="flex justify-between text-xs">
-                  <p className="text-metallic">PR: {ex.personal} {ex.unit}</p>
-                  <p className="text-green-400 font-bold">{ex.trend}</p>
+              ))}
+            </div>
+          </div>
+
+          {/* Exercise Progress / Personal Records */}
+          <div>
+            <h3 className="font-bold font-playfair mb-4 flex items-center gap-2">
+              <Award size={18} className={primaryGreen} />
+              Exercise Progress
+            </h3>
+            <div className="space-y-3">
+              {exerciseProgress.map((ex, idx) => (
+                <div key={idx} className={`${bgSecondary} border ${border} rounded-lg p-3 hover:border-[#47A025] transition cursor-pointer`}>
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="font-bold font-playfair text-sm">{ex.name}</h4>
+                    <span className={`${primaryGreen} text-sm font-bold`}>{ex.current} {ex.unit}</span>
+                  </div>
+                  
+                  {/* Progress Bar */}
+                  <div className={`w-full h-2 rounded-full overflow-hidden ${bgTertiary} mb-2`}>
+                    <div
+                      className={`h-full ${primaryGreenBg} rounded-full transition-all`}
+                      style={{ width: `${ex.progress}%` }}
+                    />
+                  </div>
+
+                  {/* Details */}
+                  <div className="flex justify-between items-center">
+                    <p className={`text-xs font-playfair ${textSecondary}`}>PR: {ex.pr} {ex.unit}</p>
+                    <div className="flex flex-col items-end gap-0.5">
+                      <p className={`text-xs font-bold ${primaryGreen}`}>{ex.trend}</p>
+                      <p className={`text-xs ${textSecondary}`}>{ex.lastUpdated}</p>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
 
-        {/* Achievements */}
-        <div className="mb-6">
-          <h3 className="font-bold mb-3">Badges & Achievements</h3>
-          <div className="grid grid-cols-3 gap-2">
-            {achievements.map((badge, idx) => (
-              <div
-                key={idx}
-                className={`flex flex-col items-center gap-2 p-3 rounded-lg border transition ${
-                  badge.unlocked
-                    ? 'bg-dark-secondary border-accent border-opacity-50 cursor-pointer hover:border-opacity-100'
-                    : 'bg-dark border-metallic border-opacity-30 opacity-50'
-                }`}
-              >
-                <span className="text-3xl">{badge.icon}</span>
-                <p className="text-xs text-center font-bold line-clamp-2">{badge.name}</p>
-                {badge.unlocked && badge.date && (
-                  <p className="text-metallic text-xs">{badge.date}</p>
-                )}
-              </div>
-            ))}
+          {/* Badges & Achievements */}
+          <div>
+            <h3 className="font-bold font-playfair mb-4">Badges & Achievements</h3>
+            <div className="grid grid-cols-3 gap-3">
+              {achievements.map((badge, idx) => (
+                <div
+                  key={idx}
+                  className={`flex flex-col items-center gap-2 p-3 rounded-lg border transition ${
+                    badge.unlocked
+                      ? `${bgSecondary} border-[#47A025] cursor-pointer hover:border-opacity-100`
+                      : `${bgTertiary} border ${border} opacity-50`
+                  }`}
+                >
+                  <span className="text-3xl">{badge.icon}</span>
+                  <p className="text-xs text-center font-bold font-playfair line-clamp-2">{badge.name}</p>
+                  {badge.unlocked && badge.date && (
+                    <p className={`text-xs font-playfair ${textSecondary}`}>{badge.date}</p>
+                  )}
+                  {!badge.unlocked && (
+                    <p className={`text-xs text-center font-playfair ${textSecondary}`}>{badge.desc}</p>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
 
-        {/* Download Report */}
-        <div className="mb-6">
-          <button className="w-full bg-accent hover:bg-green-400 text-dark font-bold py-4 rounded-lg transition flex items-center justify-center gap-2">
-            <Download size={18} />
-            Download Progress Report
-          </button>
-        </div>
+          {/* Motivational CTA */}
+          <div className={`${primaryGreenBg} rounded-xl p-6 text-[#100E0E] text-center`}>
+            <p className="text-3xl mb-2">🎯</p>
+            <h3 className="font-bold font-playfair text-lg mb-2">Keep It Going!</h3>
+            <p className="text-sm opacity-90 mb-4">You're making amazing progress. Stay consistent!</p>
+            <button className={`${bgTertiary} hover:bg-[#2d6015] text-[#47A025] font-bold font-playfair px-6 py-2 rounded-lg transition text-sm`}>
+              View Goals
+            </button>
+          </div>
 
-        {/* Motivational Section */}
-        <div className="bg-gradient-to-r from-accent to-green-400 rounded-lg p-6 text-dark text-center mb-6">
-          <p className="text-4xl mb-2">🎯</p>
-          <h3 className="font-bold text-lg mb-1">Keep It Going!</h3>
-          <p className="text-sm opacity-90 mb-3">You're making amazing progress. Stay consistent!</p>
-          <button className="bg-dark hover:bg-dark-secondary text-accent font-bold px-6 py-2 rounded-lg transition text-sm">
-            View Goals
-          </button>
+          {/* Download Report Button */}
+          <div>
+            <button className={`w-full ${primaryGreenBg} hover:bg-[#2d6015] text-[#100E0E] font-bold font-playfair py-4 rounded-lg transition flex items-center justify-center gap-2`}>
+              <Download size={18} />
+              Download Progress Report
+            </button>
+          </div>
+
         </div>
       </div>
     </div>

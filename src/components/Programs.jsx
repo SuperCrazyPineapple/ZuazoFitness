@@ -1,21 +1,47 @@
-// src/components/Programs.jsx
+import React, { useState, useEffect } from 'react';
+import { Search, Star, Users, Clock, Zap, PlayCircle } from 'lucide-react';
 
-import React, { useState } from 'react';
-import { Play, Clock, Zap, Target, Users, BookOpen, Video, ChevronRight, Star, Download, Flame, TrendingUp } from 'lucide-react';
+export default function Programs() {
+  // Ajouter la typographie Playfair Display
+  useEffect(() => {
+    const style = document.createElement('style');
+    style.textContent = `
+      @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&display=swap');
+      
+      .font-playfair {
+        font-family: 'Playfair Display', serif;
+      }
+      
+      .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+      
+      .no-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+    `;
+    document.head.appendChild(style);
+    return () => document.head.removeChild(style);
+  }, []);
 
-export default function Programs({ user }) {
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  // Styles cohérents CALISTHENX
+  const darkMode = true;
+  const bg = 'bg-[#100E0E]';
+  const bgSecondary = 'bg-[#1a1817]';
+  const bgTertiary = 'bg-[#242220]';
+  const text = 'text-white';
+  const textSecondary = 'text-[#BFB7B6]';
+  const border = 'border-[#BFB7B6]';
+  const primaryGreen = 'text-[#47A025]';
+  const primaryGreenBg = 'bg-[#47A025]';
+  const primaryGreenHover = 'hover:bg-[#2d6015]';
+
+  const [selectedCategory, setSelectedCategory] = useState('strength');
+  const [selectedLevel, setSelectedLevel] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
   const [selectedProgram, setSelectedProgram] = useState(null);
-  const [enrolledPrograms, setEnrolledPrograms] = useState([1, 2]);
-
-  const categories = [
-    { id: 'all', name: 'All Programs', icon: '📚' },
-    { id: 'strength', name: 'Strength', icon: '💪' },
-    { id: 'cardio', name: 'Cardio', icon: '🏃' },
-    { id: 'yoga', name: 'Yoga', icon: '🧘' },
-    { id: 'hiit', name: 'HIIT', icon: '⚡' },
-    { id: 'flexibility', name: 'Flexibility', icon: '🤸' }
-  ];
+  const [showModal, setShowModal] = useState(false);
 
   const programs = [
     {
@@ -24,35 +50,33 @@ export default function Programs({ user }) {
       category: 'strength',
       level: 'Intermediate',
       duration: '8 weeks',
-      difficulty: 'Advanced',
+      difficulty: 'Hard',
       rating: 4.8,
       reviews: 234,
-      enrolled: 1203,
-      image: '🤸',
-      description: 'Master advanced pushing movements',
+      enrolled: 1234,
+      description: 'Master push movements with progressive training',
       exercises: 42,
       sessions: 24,
       progress: 35,
       status: 'ongoing',
       nextSession: 'Tomorrow at 18:00',
-      features: ['Video tutorials', 'Progress tracking', 'Community support'],
+      features: ['Expert coaching', 'Video tutorials', 'Progressive overload'],
       highlights: [
-        { week: 1, focus: 'Push-up progressions' },
-        { week: 4, focus: 'Archer push-ups' },
-        { week: 8, focus: 'One-arm push-ups' }
+        { week: 1, focus: 'Foundations' },
+        { week: 4, focus: 'Advanced variations' },
+        { week: 8, focus: 'Peak performance' }
       ]
     },
     {
       id: 2,
       title: 'Handstand Academy',
-      category: 'strength',
+      category: 'skill',
       level: 'Advanced',
       duration: '12 weeks',
       difficulty: 'Elite',
       rating: 4.9,
       reviews: 456,
       enrolled: 876,
-      image: '🤲',
       description: 'Complete handstand mastery program',
       exercises: 56,
       sessions: 36,
@@ -76,7 +100,6 @@ export default function Programs({ user }) {
       rating: 4.6,
       reviews: 789,
       enrolled: 2341,
-      image: '🔥',
       description: 'Intense fat-burning workouts',
       exercises: 30,
       sessions: 18,
@@ -92,14 +115,13 @@ export default function Programs({ user }) {
     {
       id: 4,
       title: 'Yoga Fundamentals',
-      category: 'yoga',
+      category: 'flexibility',
       level: 'Beginner',
       duration: '4 weeks',
       difficulty: 'Easy',
       rating: 4.7,
       reviews: 567,
       enrolled: 1876,
-      image: '🧘',
       description: 'Start your yoga journey with basics',
       exercises: 28,
       sessions: 16,
@@ -122,7 +144,6 @@ export default function Programs({ user }) {
       rating: 4.5,
       reviews: 234,
       enrolled: 3456,
-      image: '💪',
       description: 'Build a solid foundation for all fitness goals',
       exercises: 35,
       sessions: 18,
@@ -145,7 +166,6 @@ export default function Programs({ user }) {
       rating: 4.8,
       reviews: 345,
       enrolled: 2234,
-      image: '🤸',
       description: 'Increase range of motion and prevent injuries',
       exercises: 48,
       sessions: 24,
@@ -160,250 +180,283 @@ export default function Programs({ user }) {
     }
   ];
 
-  const filteredPrograms = selectedCategory === 'all' 
-    ? programs 
-    : programs.filter(p => p.category === selectedCategory);
+  const categories = [
+    { id: 'all', label: 'All Programs' },
+    { id: 'strength', label: 'Strength' },
+    { id: 'cardio', label: 'Cardio' },
+    { id: 'flexibility', label: 'Flexibility' },
+    { id: 'skill', label: 'Skills' }
+  ];
 
-  const toggleEnroll = (programId) => {
-    if (enrolledPrograms.includes(programId)) {
-      setEnrolledPrograms(enrolledPrograms.filter(id => id !== programId));
-    } else {
-      setEnrolledPrograms([...enrolledPrograms, programId]);
-    }
-  };
+  const levels = [
+    { id: 'all', label: 'All Levels' },
+    { id: 'Beginner', label: 'Beginner' },
+    { id: 'Intermediate', label: 'Intermediate' },
+    { id: 'Advanced', label: 'Advanced' }
+  ];
 
-  const renderProgram = (program) => {
-    const isEnrolled = enrolledPrograms.includes(program.id);
-
-    return (
-      <div
-        key={program.id}
-        className="bg-dark-secondary border border-metallic border-opacity-30 rounded-xl overflow-hidden hover:border-accent hover:border-opacity-50 transition cursor-pointer"
-        onClick={() => setSelectedProgram(program.id)}
-      >
-        {/* Program Card Header */}
-        <div className="aspect-video bg-gradient-to-br from-dark to-dark-secondary flex items-center justify-center text-6xl relative overflow-hidden">
-          {program.image}
-          <div className="absolute top-3 right-3 bg-dark-secondary bg-opacity-80 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 border border-metallic border-opacity-30">
-            <Star size={12} className="fill-yellow-400 text-yellow-400" />
-            {program.rating}
-          </div>
-          {isEnrolled && (
-            <div className="absolute top-3 left-3 bg-accent text-dark px-3 py-1 rounded-full text-xs font-bold">
-              ✓ Enrolled
-            </div>
-          )}
-        </div>
-
-        {/* Program Info */}
-        <div className="p-4">
-          <div className="flex items-start justify-between mb-2">
-            <div className="flex-1">
-              <h3 className="text-lg font-bold mb-1">{program.title}</h3>
-              <p className="text-metallic text-xs line-clamp-2">{program.description}</p>
-            </div>
-          </div>
-
-          {/* Stats */}
-          <div className="grid grid-cols-3 gap-2 text-xs mb-3 py-2 border-t border-b border-metallic border-opacity-20">
-            <div>
-              <p className="text-metallic font-bold">LEVEL</p>
-              <p className="font-bold">{program.level}</p>
-            </div>
-            <div>
-              <p className="text-metallic font-bold">DURATION</p>
-              <p className="font-bold">{program.duration}</p>
-            </div>
-            <div>
-              <p className="text-metallic font-bold">SESSIONS</p>
-              <p className="font-bold text-accent">{program.sessions}</p>
-            </div>
-          </div>
-
-          {/* Features */}
-          <div className="flex gap-2 flex-wrap mb-3">
-            {program.features.slice(0, 2).map((feature, idx) => (
-              <span key={idx} className="text-xs bg-accent bg-opacity-20 text-accent px-2 py-1 rounded-full font-bold">
-                {feature}
-              </span>
-            ))}
-          </div>
-
-          {/* Progress or CTA */}
-          {program.status === 'ongoing' ? (
-            <div>
-              <div className="mb-2">
-                <div className="flex justify-between mb-1 text-xs">
-                  <span className="font-bold">Progress</span>
-                  <span className="text-accent">{program.progress}%</span>
-                </div>
-                <div className="w-full h-2 bg-dark rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-accent rounded-full transition-all"
-                    style={{ width: `${program.progress}%` }}
-                  />
-                </div>
-              </div>
-              <p className="text-metallic text-xs mb-2">{program.nextSession}</p>
-              <button className="w-full bg-accent hover:bg-green-400 text-dark font-bold py-2 rounded-lg transition text-sm flex items-center justify-center gap-2">
-                <Play size={14} />
-                Continue
-              </button>
-            </div>
-          ) : (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                toggleEnroll(program.id);
-              }}
-              className={`w-full font-bold py-3 rounded-lg transition flex items-center justify-center gap-2 text-sm ${
-                isEnrolled
-                  ? 'bg-dark border border-accent border-opacity-50 text-accent hover:bg-dark-secondary'
-                  : 'bg-accent hover:bg-green-400 text-dark'
-              }`}
-            >
-              {isEnrolled ? '✓ Enrolled' : (
-                <>
-                  <Download size={14} />
-                  Start Program
-                </>
-              )}
-            </button>
-          )}
-        </div>
-      </div>
-    );
-  };
+  const filteredPrograms = programs.filter(program => {
+    const matchesCategory = selectedCategory === 'all' || program.category === selectedCategory;
+    const matchesLevel = selectedLevel === 'all' || program.level === selectedLevel;
+    const matchesSearch = program.title.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesCategory && matchesLevel && matchesSearch;
+  });
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-dark via-dark-secondary to-dark font-poppins text-white pb-28">
+    <div className={`w-full h-screen ${bg} ${text} flex flex-col overflow-hidden transition-colors duration-300`}>
+      
       {/* Header */}
-      <div className="sticky top-0 z-20 bg-dark-secondary border-b border-metallic border-opacity-20 backdrop-blur-sm">
-        <div className="max-w-md mx-auto px-6 py-4">
-          <h1 className="text-2xl font-bold">Programs</h1>
-          <p className="text-metallic text-sm">Choose your training path</p>
+      <div className={`${bgSecondary} border-b ${border} flex-shrink-0`}>
+        <div className="w-full px-6 py-3 flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold font-playfair">Programs</h1>
+            <p className={`${textSecondary} text-xs font-playfair`}>Choose your training path</p>
+          </div>
         </div>
       </div>
 
-      <div className="max-w-md mx-auto px-6">
-        {/* Categories */}
-        <div className="mt-6 flex gap-2 overflow-x-auto pb-4 -mx-6 px-6 no-scrollbar">
-          {categories.map(cat => (
-            <button
-              key={cat.id}
-              onClick={() => setSelectedCategory(cat.id)}
-              className={`px-3 py-2 rounded-full whitespace-nowrap font-bold text-sm transition flex-shrink-0 ${
-                selectedCategory === cat.id
-                  ? 'bg-accent text-dark'
-                  : 'bg-dark-secondary border border-metallic border-opacity-30 hover:border-metallic hover:border-opacity-50'
-              }`}
-            >
-              <span className="mr-1">{cat.icon}</span>
-              {cat.name}
-            </button>
-          ))}
-        </div>
+      {/* Main Content */}
+      <div className="flex-1 overflow-y-auto">
+        <div className="w-full px-6 py-4">
 
-        {/* Programs Count */}
-        <div className="mt-6 flex items-center justify-between mb-4">
-          <p className="text-metallic text-sm">{filteredPrograms.length} programs available</p>
-          <div className="text-xs font-bold text-accent">
-            {enrolledPrograms.length} enrolled
-          </div>
-        </div>
-
-        {/* Featured Banner */}
-        {selectedCategory === 'all' && (
-          <div className="bg-gradient-to-r from-accent to-green-400 rounded-xl p-4 mb-6 text-dark">
-            <div className="flex items-center gap-3 mb-2">
-              <Flame size={20} />
-              <h3 className="font-bold">Trending This Week</h3>
-            </div>
-            <p className="text-sm opacity-90 mb-3">HIIT Shred - 300+ people started today</p>
-            <button className="bg-dark hover:bg-dark-secondary text-accent font-bold py-2 px-4 rounded-lg transition text-sm">
-              Explore
-            </button>
-          </div>
-        )}
-
-        {/* Programs Grid */}
-        <div className="space-y-4 mb-6">
-          {filteredPrograms.map(renderProgram)}
-        </div>
-
-        {filteredPrograms.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-4xl mb-2">😴</p>
-            <p className="text-metallic mb-4">No programs in this category yet</p>
-            <button
-              onClick={() => setSelectedCategory('all')}
-              className="bg-accent text-dark font-bold px-4 py-2 rounded-lg hover:bg-green-400 transition"
-            >
-              View All Programs
-            </button>
-          </div>
-        )}
-
-        {/* Create Custom Program */}
-        <div className="mb-6 bg-gradient-to-br from-dark-secondary to-dark border-2 border-metallic border-opacity-30 rounded-xl p-6 hover:border-accent hover:border-opacity-50 transition">
-          <h3 className="text-xl font-bold mb-2">Create Custom Workout</h3>
-          <p className="text-metallic text-sm mb-4">Build your own program based on your goals and available time</p>
-          <div className="flex gap-2">
-            <button className="flex-1 bg-accent hover:bg-green-400 text-dark font-bold py-3 rounded-lg transition">
-              Start Builder
-            </button>
-            <button className="flex-1 bg-dark-secondary border border-metallic border-opacity-30 hover:border-metallic hover:border-opacity-50 font-bold py-3 rounded-lg transition">
-              Templates
-            </button>
-          </div>
-        </div>
-
-        {/* Info Section */}
-        <div className="mb-6">
-          <h3 className="font-bold mb-3 flex items-center gap-2">
-            <TrendingUp size={18} className="text-accent" />
-            Why Choose Our Programs?
-          </h3>
-          <div className="space-y-2">
-            {[
-              { icon: '📹', text: 'Professional video tutorials for every exercise' },
-              { icon: '📊', text: 'Detailed progress tracking and analytics' },
-              { icon: '🎯', text: 'Personalized recommendations based on goals' },
-              { icon: '👥', text: 'Community support and motivation' },
-              { icon: '💪', text: 'Progressive overload built-in' },
-              { icon: '⭐', text: '4.7+ average rating from users' }
-            ].map((item, idx) => (
-              <div key={idx} className="flex items-start gap-3 text-sm">
-                <span className="text-lg flex-shrink-0">{item.icon}</span>
-                <p className="text-metallic-light">{item.text}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Enrolled Programs Quick Access */}
-        {enrolledPrograms.length > 0 && (
+          {/* Search Bar */}
           <div className="mb-6">
-            <h3 className="font-bold mb-3">Your Programs</h3>
-            <div className="space-y-2">
-              {programs
-                .filter(p => enrolledPrograms.includes(p.id))
-                .map(program => (
-                  <div key={program.id} className="bg-dark-secondary border border-accent border-opacity-30 rounded-lg p-3 flex items-center justify-between hover:border-accent hover:border-opacity-50 cursor-pointer transition">
-                    <div className="flex items-center gap-3 flex-1">
-                      <span className="text-2xl">{program.image}</span>
-                      <div className="flex-1">
-                        <p className="font-bold text-sm">{program.title}</p>
-                        <p className="text-metallic text-xs">{program.duration}</p>
-                      </div>
-                    </div>
-                    <ChevronRight size={16} className="text-metallic-light" />
-                  </div>
-                ))}
+            <div className="relative">
+              <Search size={18} className={`absolute left-3 top-3 ${textSecondary}`} />
+              <input
+                type="text"
+                placeholder="Search programs..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className={`w-full pl-10 pr-4 py-3 font-playfair ${bgTertiary} border-[#BFB7B6] border rounded-lg text-sm focus:border-[#47A025] outline-none transition ${text}`}
+              />
             </div>
           </div>
-        )}
+
+          {/* Category Filter */}
+          <div className="mb-6">
+            <p className={`text-sm font-bold font-playfair ${textSecondary} mb-3`}>Category</p>
+            <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
+              {categories.map(cat => (
+                <button
+                  key={cat.id}
+                  onClick={() => setSelectedCategory(cat.id)}
+                  className={`px-4 py-2 rounded-lg font-bold font-playfair text-sm whitespace-nowrap transition flex-shrink-0 ${
+                    selectedCategory === cat.id
+                      ? `${primaryGreenBg} text-[#100E0E]`
+                      : `${bgSecondary} border ${border} ${text} hover:border-[#BFB7B6]`
+                  }`}
+                >
+                  {cat.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Level Filter */}
+          <div className="mb-8">
+            <p className={`text-sm font-bold font-playfair ${textSecondary} mb-3`}>Difficulty Level</p>
+            <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
+              {levels.map(lvl => (
+                <button
+                  key={lvl.id}
+                  onClick={() => setSelectedLevel(lvl.id)}
+                  className={`px-4 py-2 rounded-lg font-bold font-playfair text-sm whitespace-nowrap transition flex-shrink-0 ${
+                    selectedLevel === lvl.id
+                      ? `${primaryGreenBg} text-[#100E0E]`
+                      : `${bgSecondary} border ${border} ${text} hover:border-[#BFB7B6]`
+                  }`}
+                >
+                  {lvl.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Programs by Category - Horizontal Scroll */}
+          <div className="space-y-6 pb-8">
+            {categories.filter(c => c.id === selectedCategory).map(cat => {
+              const categoryPrograms = filteredPrograms.filter(p => p.category === cat.id);
+              
+              return (
+                <div key={cat.id}>
+                  <h2 className={`text-xl font-bold font-playfair ${text} mb-3`}>{cat.label} Programs</h2>
+                  <div className="flex gap-4 overflow-x-auto pb-2 no-scrollbar">
+                    {categoryPrograms.map(program => (
+                      <div
+                        key={program.id}
+                        className={`${bgSecondary} border ${border} rounded-xl overflow-hidden hover:border-[#47A025] transition flex-shrink-0 w-72`}
+                      >
+                        {/* Video Space */}
+                        <div className={`w-full h-40 ${bgTertiary} border-b ${border} flex items-center justify-center`}>
+                          <div className="text-center">
+                            <PlayCircle size={40} className={`${primaryGreen} mx-auto mb-2 opacity-50`} />
+                            <p className={`text-xs font-playfair ${textSecondary}`}>Video Tutorial</p>
+                          </div>
+                        </div>
+
+                        {/* Program Header */}
+                        <div className="p-3 border-b border-inherit">
+                          <h3 className="text-base font-bold font-playfair">{program.title}</h3>
+                          <p className={`text-xs font-playfair ${textSecondary} mt-1 line-clamp-2`}>{program.description}</p>
+
+                          {/* Tags */}
+                          <div className="flex gap-2 mt-2">
+                            <span className={`text-xs font-playfair ${primaryGreenBg} bg-opacity-20 ${primaryGreen} px-2 py-1 rounded-full font-bold`}>
+                              {program.level}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Program Stats */}
+                        <div className="p-3 grid grid-cols-2 gap-3 border-b border-inherit">
+                          <div className="flex items-center gap-1">
+                            <Star size={14} className={primaryGreen} />
+                            <div>
+                              <p className={`text-xs font-playfair ${textSecondary}`}>Rating</p>
+                              <p className={`font-bold font-playfair text-xs ${primaryGreen}`}>{program.rating}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Users size={14} className={textSecondary} />
+                            <div>
+                              <p className={`text-xs font-playfair ${textSecondary}`}>Users</p>
+                              <p className="font-bold font-playfair text-xs">{(program.enrolled / 1000).toFixed(1)}k</p>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Progress Bar */}
+                        {program.status === 'ongoing' && (
+                          <div className="px-3 py-2 border-b border-inherit">
+                            <div className="flex justify-between mb-1">
+                              <p className={`text-xs font-bold font-playfair ${text}`}>Progress</p>
+                              <p className={`text-xs font-bold font-playfair ${primaryGreen}`}>{program.progress}%</p>
+                            </div>
+                            <div className={`w-full h-1.5 rounded-full overflow-hidden ${bgTertiary}`}>
+                              <div
+                                className={`h-full ${primaryGreenBg} transition-all duration-300`}
+                                style={{ width: `${program.progress}%` }}
+                              />
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Action Button */}
+                        <div className="p-3">
+                          <button
+                            onClick={() => {
+                              setSelectedProgram(program);
+                              setShowModal(true);
+                            }}
+                            className={`w-full flex items-center justify-center gap-2 py-2 rounded-lg font-bold font-playfair text-sm transition ${primaryGreenBg} ${primaryGreenHover} text-[#100E0E]`}
+                          >
+                            <PlayCircle size={14} />
+                            {program.status === 'ongoing' ? 'Continue' : 'Start'}
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  {categoryPrograms.length === 0 && (
+                    <p className={`${textSecondary} font-playfair text-sm`}>No programs in this category</p>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+        </div>
       </div>
+
+      {/* Modal - Continue Training */}
+      {showModal && selectedProgram && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+          <div className={`${bgSecondary} border ${border} rounded-xl max-w-2xl w-full max-h-96 overflow-y-auto`}>
+            {/* Modal Header */}
+            <div className={`sticky top-0 ${bgSecondary} border-b ${border} px-6 py-4 flex justify-between items-center`}>
+              <h2 className="text-2xl font-bold font-playfair">{selectedProgram.title}</h2>
+              <button
+                onClick={() => setShowModal(false)}
+                className={`text-2xl font-playfair ${textSecondary} hover:text-white transition`}
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div className="px-6 py-4 space-y-4">
+              {/* Video Area */}
+              <div className={`w-full h-48 ${bgTertiary} rounded-lg border ${border} flex items-center justify-center`}>
+                <div className="text-center">
+                  <PlayCircle size={56} className={`${primaryGreen} mx-auto mb-2 opacity-50`} />
+                  <p className={`font-playfair ${textSecondary}`}>Workout Video</p>
+                </div>
+              </div>
+
+              {/* Program Info */}
+              <div>
+                <p className={`${textSecondary} text-sm font-playfair mb-2`}>{selectedProgram.description}</p>
+              </div>
+
+              {/* Key Stats */}
+              <div className="grid grid-cols-3 gap-3">
+                <div className={`${bgSecondary} border ${border} p-3 rounded-lg text-center`}>
+                  <p className={`text-xs font-playfair ${textSecondary}`}>Sessions</p>
+                  <p className="font-bold font-playfair text-lg">{selectedProgram.sessions}</p>
+                </div>
+                <div className={`${bgSecondary} border ${border} p-3 rounded-lg text-center`}>
+                  <p className={`text-xs font-playfair ${textSecondary}`}>Duration</p>
+                  <p className="font-bold font-playfair text-lg">{selectedProgram.duration}</p>
+                </div>
+                <div className={`${bgSecondary} border ${border} p-3 rounded-lg text-center`}>
+                  <p className={`text-xs font-playfair ${textSecondary}`}>Difficulty</p>
+                  <p className={`font-bold font-playfair text-lg ${primaryGreen}`}>{selectedProgram.level}</p>
+                </div>
+              </div>
+
+              {/* Highlights */}
+              <div>
+                <h3 className="font-bold font-playfair mb-2">Program Highlights</h3>
+                <div className="space-y-2">
+                  {selectedProgram.highlights.map((h, idx) => (
+                    <div key={idx} className={`${bgSecondary} border ${border} p-2 rounded text-sm`}>
+                      <p className="font-playfair"><span className={primaryGreen}>Week {h.week}:</span> {h.focus}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Features */}
+              <div>
+                <h3 className="font-bold font-playfair mb-2">Features</h3>
+                <div className="flex flex-wrap gap-2">
+                  {selectedProgram.features.map((f, idx) => (
+                    <span key={idx} className={`text-xs font-playfair ${primaryGreenBg} bg-opacity-20 ${primaryGreen} px-3 py-1 rounded-full`}>
+                      ✓ {f}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-3 pt-4 border-t border-inherit">
+                <button
+                  onClick={() => setShowModal(false)}
+                  className={`flex-1 py-3 rounded-lg font-bold font-playfair transition ${bgSecondary} border ${border} hover:border-[#BFB7B6]`}
+                >
+                  Cancel
+                </button>
+                <button
+                  className={`flex-1 py-3 rounded-lg font-bold font-playfair ${primaryGreenBg} ${primaryGreenHover} text-[#100E0E] transition`}
+                >
+                  {selectedProgram.status === 'ongoing' ? 'Resume Training' : 'Start Now'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
